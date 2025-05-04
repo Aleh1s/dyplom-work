@@ -17,6 +17,7 @@ import ua.aleh1s.usersservice.jwt.ClaimsNames;
 import ua.aleh1s.usersservice.mapper.UserMapper;
 import ua.aleh1s.usersservice.repository.UserRepository;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -101,5 +102,19 @@ public class UserService {
         }
 
         return userMapper.toUserProfile(userEntity, activeSubscription);
+    }
+
+    public List<User> getUsersByUsernameLike(String usernameLike) {
+        if (Objects.isNull(usernameLike) || usernameLike.isBlank()) {
+            return List.of();
+        }
+
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = jwt.getClaimAsString(ClaimsNames.SUBJECT);
+
+        return userRepository.findUserEntitiesByUsernameLike(usernameLike).stream()
+                .filter(userEntity -> !userEntity.getId().equals(userId))
+                .map(userMapper::toUser)
+                .toList();
     }
 }

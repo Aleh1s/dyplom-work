@@ -8,6 +8,8 @@ import ua.aleh1s.usersservice.dto.User;
 import ua.aleh1s.usersservice.dto.UserProfile;
 import ua.aleh1s.usersservice.service.UserService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -33,6 +35,13 @@ public class UserController {
     public ResponseEntity<UserProfile> getUserProfileByUsername(@PathVariable String username) {
         return ResponseEntity.ok(
                 userService.getUserProfileByUsername(username)
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity<List<User>> getUsersByUsernameLike(@RequestParam String usernameLike) {
+        return ResponseEntity.ok(
+                userService.getUsersByUsernameLike(usernameLike)
         );
     }
 }
