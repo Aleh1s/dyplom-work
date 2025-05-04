@@ -1,0 +1,17 @@
+meta {
+  name: refresh-access-token
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8081/auth/refresh
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "refreshToken": "eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJjMGJkYWEzZC1jNTQ2LTQyNjgtYjVmNi02MjMzYmNmZWMyMjYifQ.eyJleHAiOjE3NDYyODM3NzksImlhdCI6MTc0NjI4MTk3OSwianRpIjoiNjVmNTg2NmEtYzgxMi00MGQ4LTg5YzItNTA1YmJjZjJhM2RmIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9SZVNoYXJlIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9SZVNoYXJlIiwic3ViIjoiZDBmOTE5NDEtZTFlZS00YjVkLThjMjktMGY4YzMxNTRhODRiIiwidHlwIjoiUmVmcmVzaCIsImF6cCI6InJlc2hhcmUtY2xpZW50Iiwic2lkIjoiOWRiOWFmNjItYTc3ZC00ZjEwLWI4OTItNjYzZmU3YTExN2EyIiwic2NvcGUiOiJvcGVuaWQgcm9sZXMgcHJvZmlsZSBhY3IgYmFzaWMgd2ViLW9yaWdpbnMgZW1haWwifQ.AYG_cSqdJEhAr7tWl-Mc96KD68XCHVSEg-ksQioQsNpSwm2rYTt1ycJfD7qtnhKD3KbUxE3g_q993EfBpqlqD"
+  }
+}

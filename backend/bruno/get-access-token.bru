@@ -1,0 +1,26 @@
+meta {
+  name: get-access-token
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8081/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "testuser@gmail.com",
+    "password": "user"
+  }
+}
+
+body:form-urlencoded {
+  client_id: reshare-client
+  client_secret: jPcaBFC1cCDXlzEhv28Mms769mL7JwXQ
+  username: testuser
+  password: user
+  grant_type: password
+}

@@ -1,0 +1,20 @@
+meta {
+  name: get-access-token-keycloak
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/realms/ReShare/protocol/openid-connect/token
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  grant_type: password
+  client_id: reshare-client
+  client_secret: jPcaBFC1cCDXlzEhv28Mms769mL7JwXQ
+  username: testuser@gmail.com
+  password: user
+  scope: openid
+}

@@ -1,0 +1,23 @@
+server:
+  port: 8081
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/ReShare
+  cloud:
+    gateway:
+      default-filters:
+        - TokenRelay
+      routes:
+        - id: users-route
+          uri: ${USERS_ROUTE_URI:http://localhost:8082}
+          predicates:
+            - Path=/users/**
+          filters:
+            - PrefixPath=/api/v1
+
+keycloak:
+  client-id: reshare-client

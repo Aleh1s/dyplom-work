@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  users_postgres_db:
+    image: postgres:17.4
+    container_name: users_postgres_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: users
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - users_postgres_db_data:/var/lib/postgresql/data
+    networks:
+      - private-network
+
+  keycloak_postgres_db:
+    image: postgres:17.4
+    container_name: keycloak_postgres_db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - keycloak_postgres_db_data:/var/lib/postgresql/data
+    networks:
+      - private-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2.2
+    container_name: keycloak
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak_postgres_db:5432/keycloak
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    depends_on:
+      - keycloak_postgres_db
+    networks:
+      - private-network
+
+volumes:
+  users_postgres_db_data:
+  keycloak_postgres_db_data:
+
+networks:
+  private-network:
