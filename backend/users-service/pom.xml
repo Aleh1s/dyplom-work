@@ -29,7 +29,6 @@
     <properties>
         <java.version>24</java.version>
         <spring-cloud.version>2024.0.1</spring-cloud.version>
-        <keycloak.version>25.0.3</keycloak.version>
     </properties>
     <dependencies>
         <dependency>
@@ -91,11 +90,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.keycloak.bom</groupId>
-                <artifactId>keycloak-adapter-bom</artifactId>
-                <version>${keycloak.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
