@@ -1,4 +1,4 @@
-package ua.aleh1s.usersservice.config;
+package ua.aleh1s.subscribersservice.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import ua.aleh1s.usersservice.jwt.CustomJwtAuthenticationConverter;
+import ua.aleh1s.subscribersservice.jwt.CustomJwtAuthenticationConverter;
 
 @Configuration
 @EnableWebSecurity

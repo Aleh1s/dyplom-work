@@ -18,6 +18,12 @@ spring:
             - Path=/users/**
           filters:
             - PrefixPath=/api/v1
+        - id: subscribers-route
+          uri: ${SUBSCRIBERS_ROUTE_URI:http://localhost:8083}
+          predicates:
+            - Path=/subscribers/**
+          filters:
+            - PrefixPath=/api/v1
 
 keycloak:
   client-id: reshare-client
