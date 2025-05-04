@@ -1,5 +1,7 @@
 package ua.aleh1s.usersservice.handler;
 
+import feign.FeignException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,6 +18,16 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.badRequest()
+                .body(apiError);
+    }
+
+    @ExceptionHandler(FeignException.Unauthorized.class)
+    public ResponseEntity<ApiError> handleException(FeignException.Unauthorized e) {
+        ApiError apiError = ApiError.builder()
+                .description(e.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(apiError);
     }
 }

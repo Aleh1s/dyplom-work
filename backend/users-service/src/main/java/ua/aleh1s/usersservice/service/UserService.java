@@ -1,16 +1,20 @@
 package ua.aleh1s.usersservice.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.aleh1s.usersservice.client.SubscriptionsClient;
 import ua.aleh1s.usersservice.domain.UserEntity;
+import ua.aleh1s.usersservice.dto.Subscription;
 import ua.aleh1s.usersservice.dto.UpdateUser;
 import ua.aleh1s.usersservice.dto.User;
+import ua.aleh1s.usersservice.dto.UserProfile;
 import ua.aleh1s.usersservice.exception.UserNotFoundException;
 import ua.aleh1s.usersservice.jwt.ClaimsNames;
-import ua.aleh1s.usersservice.mapper.UserInfoMapper;
+import ua.aleh1s.usersservice.mapper.UserMapper;
 import ua.aleh1s.usersservice.repository.UserRepository;
 
 import java.util.Objects;
@@ -21,7 +25,8 @@ import java.util.Objects;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserInfoMapper userInfoMapper;
+    private final UserMapper userMapper;
+    private final SubscriptionsClient subscriptionsClient;
 
     @Transactional
     public User getUserInfoOrCreate() {
@@ -30,7 +35,7 @@ public class UserService {
         UserEntity userEntity = userRepository.findUserEntityByUsername(jwt.getClaimAsString(ClaimsNames.USERNAME))
                 .orElseGet(this::saveAndReturnNewUser);
 
-        return userInfoMapper.toUserInfo(userEntity);
+        return userMapper.toUser(userEntity);
     }
 
     @Transactional
@@ -63,7 +68,7 @@ public class UserService {
 
         userEntity = userRepository.save(userEntity);
 
-        return userInfoMapper.toUserInfo(userEntity);
+        return userMapper.toUser(userEntity);
     }
 
     public UserEntity getUserByUsername(String username) {
@@ -83,5 +88,18 @@ public class UserService {
                 .build();
 
         return userRepository.save(userEntity);
+    }
+
+    public UserProfile getUserProfileByUsername(String username) {
+        UserEntity userEntity = getUserByUsername(username);
+
+        Subscription activeSubscription;
+        try {
+            activeSubscription = subscriptionsClient.getActiveSubscription(userEntity.getId());
+        } catch (FeignException.NotFound e) {
+            activeSubscription = null;
+        }
+
+        return userMapper.toUserProfile(userEntity, activeSubscription);
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.aleh1s.usersservice.dto.UpdateUser;
 import ua.aleh1s.usersservice.dto.User;
+import ua.aleh1s.usersservice.dto.UserProfile;
 import ua.aleh1s.usersservice.service.UserService;
 
 @RestController
@@ -25,6 +26,13 @@ public class UserController {
     public ResponseEntity<User> updateMe(@RequestBody UpdateUser updateUser) {
         return ResponseEntity.ok(
                 userService.updateUserInfo(updateUser)
+        );
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<UserProfile> getUserProfileByUsername(@PathVariable String username) {
+        return ResponseEntity.ok(
+                userService.getUserProfileByUsername(username)
         );
     }
 }
