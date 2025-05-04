@@ -27,13 +27,8 @@ public class UserService {
     public User getUserInfoOrCreate() {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        UserEntity userEntity = userRepository.findUserEntityByUsername(
-                jwt.getClaimAsString(ClaimsNames.USERNAME)
-        ).orElseGet(this::buildDefaultUserEntity);
-
-        if (Objects.isNull(userEntity.getId())) {
-            userEntity = userRepository.save(userEntity);
-        }
+        UserEntity userEntity = userRepository.findUserEntityByUsername(jwt.getClaimAsString(ClaimsNames.USERNAME))
+                .orElseGet(this::saveAndReturnNewUser);
 
         return userInfoMapper.toUserInfo(userEntity);
     }
@@ -76,14 +71,17 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(username));
     }
 
-    private UserEntity buildDefaultUserEntity() {
+    private UserEntity saveAndReturnNewUser() {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        return UserEntity.builder()
+        UserEntity userEntity = UserEntity.builder()
+                .id(jwt.getClaimAsString(ClaimsNames.SUBJECT))
                 .username(jwt.getClaimAsString(ClaimsNames.USERNAME))
                 .email(jwt.getClaimAsString(ClaimsNames.EMAIL))
                 .givenName(jwt.getClaimAsString(ClaimsNames.GIVEN_NAME))
                 .familyName(jwt.getClaimAsString(ClaimsNames.FAMILY_NAME))
                 .build();
+
+        return userRepository.save(userEntity);
     }
 }

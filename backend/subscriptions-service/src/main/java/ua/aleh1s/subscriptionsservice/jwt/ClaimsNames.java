@@ -1,4 +1,4 @@
-package ua.aleh1s.usersservice.jwt;
+package ua.aleh1s.subscriptionsservice.jwt;
 
 public interface ClaimsNames {
     String SUBJECT = "sub";

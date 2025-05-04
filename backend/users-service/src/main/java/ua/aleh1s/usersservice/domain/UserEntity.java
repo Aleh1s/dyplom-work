@@ -16,16 +16,7 @@ import java.util.Map;
 public class UserEntity {
 
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "users_seq_generator"
-    )
-    @SequenceGenerator(
-            name = "users_seq_generator",
-            sequenceName = "users_id_sequence",
-            allocationSize = 1
-    )
-    private Long id;
+    private String id;
 
     private String givenName;
     private String familyName;

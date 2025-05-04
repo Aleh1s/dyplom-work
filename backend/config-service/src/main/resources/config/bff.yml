@@ -21,7 +21,7 @@ spring:
         - id: subscribers-route
           uri: ${SUBSCRIBERS_ROUTE_URI:http://localhost:8083}
           predicates:
-            - Path=/subscribers/**
+            - Path=/subscriptions/**
           filters:
             - PrefixPath=/api/v1
 
