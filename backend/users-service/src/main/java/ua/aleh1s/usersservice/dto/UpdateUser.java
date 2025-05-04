@@ -1,15 +1,14 @@
 package ua.aleh1s.usersservice.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 import ua.aleh1s.usersservice.domain.SocialMediaType;
 
 import java.util.Map;
 
 @Data
 @Builder
-public class User {
-    private String username;
-    private String email;
+public class UpdateUser {
     private String givenName;
     private String familyName;
     private String bio;

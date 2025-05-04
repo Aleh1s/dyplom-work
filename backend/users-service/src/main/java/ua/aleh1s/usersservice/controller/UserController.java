@@ -2,9 +2,8 @@ package ua.aleh1s.usersservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ua.aleh1s.usersservice.dto.UpdateUser;
 import ua.aleh1s.usersservice.dto.User;
 import ua.aleh1s.usersservice.service.UserService;
 
@@ -19,6 +18,13 @@ public class UserController {
     public ResponseEntity<User> getMe() {
         return ResponseEntity.ok(
                 userService.getUserInfoOrCreate()
+        );
+    }
+
+    @PutMapping
+    public ResponseEntity<User> updateMe(@RequestBody UpdateUser updateUser) {
+        return ResponseEntity.ok(
+                userService.updateUserInfo(updateUser)
         );
     }
 }
