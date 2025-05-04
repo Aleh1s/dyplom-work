@@ -37,8 +37,6 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Abstract
             if (clientAccess != null && clientAccess.containsKey("roles")) {
                 List<String> roles = (List<String>) clientAccess.get("roles");
 
-                roles.forEach(System.out::println);
-
                 roles.forEach(role -> authorities.add(
                         new SimpleGrantedAuthority("ROLE_%s".formatted(role)))
                 );
