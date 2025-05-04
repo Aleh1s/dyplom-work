@@ -3,9 +3,7 @@ package ua.aleh1s.subscriptionsservice.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ua.aleh1s.subscriptionsservice.dto.CreateSubscriptionPlan;
-import ua.aleh1s.subscriptionsservice.dto.SubscriptionPlan;
-import ua.aleh1s.subscriptionsservice.dto.UpdateSubscriptionPlan;
+import ua.aleh1s.subscriptionsservice.dto.*;
 import ua.aleh1s.subscriptionsservice.service.SubscriptionService;
 
 @RestController
@@ -39,6 +37,24 @@ public class SubscriptionController {
     ) {
         return ResponseEntity.ok(
                 subscriptionService.getSubscriptionPlanByUserId(userId)
+        );
+    }
+
+    @PostMapping("/subscribe")
+    public ResponseEntity<Subscription> subscribe(
+            @RequestBody SubscribeRequest subscribeRequest
+    ) {
+        return ResponseEntity.ok(
+                subscriptionService.subscribe(subscribeRequest)
+        );
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<Subscription> getActiveSubscription(
+            @RequestParam String subscribedOnId
+    ) {
+        return ResponseEntity.ok(
+                subscriptionService.getActiveSubscription(subscribedOnId)
         );
     }
 }

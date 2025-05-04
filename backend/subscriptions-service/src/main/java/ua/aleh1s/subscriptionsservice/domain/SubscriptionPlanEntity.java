@@ -3,8 +3,9 @@ package ua.aleh1s.subscriptionsservice.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -23,6 +24,9 @@ public class SubscriptionPlanEntity {
     private Integer priceInCents;
     private Instant createdAt;
     private Instant updatedAt;
+    @Setter(AccessLevel.PRIVATE)
+    @OneToMany(mappedBy = "subscriptionPlan", cascade = CascadeType.ALL)
+    private List<SubscriptionEntity> subscriptions = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
