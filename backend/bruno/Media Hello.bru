@@ -1,17 +1,13 @@
 meta {
-  name: Get users by username like
+  name: Media Hello
   type: http
-  seq: 13
+  seq: 14
 }
 
 get {
-  url: http://localhost:8081/users?usernameLike=user
+  url: http://localhost:8081/saveMediaArgs/hello
   body: none
   auth: inherit
-}
-
-params:query {
-  usernameLike: user
 }
 
 headers {

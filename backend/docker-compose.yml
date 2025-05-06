@@ -61,10 +61,44 @@ services:
     networks:
       - private-network
 
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - private-network
+
+  media_mongodb:
+    image: mongo
+    container_name: media_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: metadata
+    ports:
+      - '27017:27017'
+    volumes:
+      - media_mongo_data:/data/db
+    networks:
+      - private-network
+
 volumes:
-  users_postgres_db_data:
-  keycloak_postgres_db_data:
-  subscriptions_postgres_db_data:
+  users_postgres_db_data: {}
+  keycloak_postgres_db_data: {}
+  subscriptions_postgres_db_data: {}
+  minio_data: {}
+  media_mongo_data: {}
 
 networks:
   private-network:

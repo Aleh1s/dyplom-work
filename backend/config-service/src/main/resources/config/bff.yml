@@ -24,6 +24,11 @@ spring:
             - Path=/subscriptions/**
           filters:
             - PrefixPath=/api/v1
-
+        - id: media-route
+          uri: ${MEDIA_ROUTE_URI:http://localhost:8084}
+          predicates:
+            - Path=/media/**
+          filters:
+            - PrefixPath=/api/v1
 keycloak:
   client-id: reshare-client

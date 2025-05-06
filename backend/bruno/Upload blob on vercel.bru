@@ -1,0 +1,19 @@
+meta {
+  name: Upload blob on vercel
+  type: http
+  seq: 16
+}
+
+put {
+  url: https://arvjczgctrduhxkd.public.blob.vercel-storage.com/upload/test.png
+  body: multipartForm
+  auth: inherit
+}
+
+headers {
+  Content-Type: image/png
+}
+
+body:multipart-form {
+  filef : @file(C:\Users\sasha\Downloads\Map (1).png)
+}

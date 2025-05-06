@@ -11,6 +11,7 @@
         <option value="$PROJECT_DIR$/bff-service/pom.xml" />
         <option value="$PROJECT_DIR$/subscribers-service/pom.xml" />
         <option value="$PROJECT_DIR$/subscriptions-service/pom.xml" />
+        <option value="$PROJECT_DIR$/media-service/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
