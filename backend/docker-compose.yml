@@ -93,12 +93,42 @@ services:
     networks:
       - private-network
 
+  content_mongodb:
+    image: mongo
+    container_name: content_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: content
+    ports:
+      - '27018:27017'
+    volumes:
+      - content_mongo_data:/data/db
+    networks:
+      - private-network
+
+  posts_mongodb:
+    image: mongo
+    container_name: posts_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: posts
+    ports:
+      - '27019:27017'
+    volumes:
+      - posts_mongo_data:/data/db
+    networks:
+      - private-network
+
 volumes:
   users_postgres_db_data: {}
   keycloak_postgres_db_data: {}
   subscriptions_postgres_db_data: {}
   minio_data: {}
   media_mongo_data: {}
+  content_mongo_data: {}
+  posts_mongo_data: {}
 
 networks:
   private-network:

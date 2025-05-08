@@ -11,7 +11,7 @@
         <module name="bff-service" />
         <module name="config-service" />
       </profile>
-      <profile name="Annotation profile for subscriptions-service" enabled="true">
+      <profile name="Annotation profile for posts-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -20,16 +20,10 @@
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.6.3/mapstruct-1.6.3.jar" />
         </processorPath>
+        <module name="posts-service" />
         <module name="subscriptions-service" />
         <module name="users-service" />
-      </profile>
-      <profile name="Annotation profile for saveMediaArgs-service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
-        </processorPath>
+        <module name="content-service" />
         <module name="media-service" />
       </profile>
     </annotationProcessing>
@@ -42,8 +36,10 @@
       <module name="auth-service" options="-parameters" />
       <module name="bff-service" options="-parameters" />
       <module name="config-service" options="-parameters" />
+      <module name="content-service" options="-parameters" />
       <module name="discovery-service" options="-parameters" />
       <module name="media-service" options="-parameters" />
+      <module name="posts-service" options="-parameters" />
       <module name="subscriptions-service" options="-parameters" />
       <module name="users-service" options="-parameters" />
     </option>

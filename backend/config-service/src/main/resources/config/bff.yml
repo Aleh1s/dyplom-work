@@ -30,5 +30,17 @@ spring:
             - Path=/media/**
           filters:
             - PrefixPath=/api/v1
+        - id: content-route
+          uri: ${CONTENT_ROUTE_URI:http://localhost:8085}
+          predicates:
+            - Path=/content/**
+          filters:
+            - PrefixPath=/api/v1
+        - id: posts-route
+          uri: ${POSTS_ROUTE_URI:http://localhost:8086}
+          predicates:
+            - Path=/posts/**
+          filters:
+            - PrefixPath=/api/v1
 keycloak:
   client-id: reshare-client

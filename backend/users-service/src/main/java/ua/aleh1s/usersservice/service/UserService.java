@@ -19,6 +19,7 @@ import ua.aleh1s.usersservice.repository.UserRepository;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -114,6 +115,20 @@ public class UserService {
 
         return userRepository.findUserEntitiesByUsernameLike(usernameLike).stream()
                 .filter(userEntity -> !userEntity.getId().equals(userId))
+                .map(userMapper::toUser)
+                .toList();
+    }
+
+    public List<User> getUsersByIds(Set<String> ids) {
+        System.out.println(1);
+
+        if (Objects.isNull(ids) || ids.isEmpty()) {
+            return List.of();
+        }
+
+        System.out.println(2);
+
+        return userRepository.findUserEntitiesByIdIn(ids).stream()
                 .map(userMapper::toUser)
                 .toList();
     }
