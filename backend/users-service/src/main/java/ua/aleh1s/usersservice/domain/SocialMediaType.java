@@ -4,5 +4,6 @@ public enum SocialMediaType {
     INSTAGRAM,
     TWITTER,
     FACEBOOK,
-    LINKEDIN
+    LINKEDIN,
+    YOUTUBE
 }

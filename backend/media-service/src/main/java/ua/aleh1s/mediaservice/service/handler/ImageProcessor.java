@@ -1,6 +1,7 @@
 package ua.aleh1s.mediaservice.service.handler;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ua.aleh1s.mediaservice.domain.Metadata;
@@ -27,6 +28,9 @@ public class ImageProcessor implements MediaProcessor {
     private static final String IMAGE_BUCKET = "images";
     private static final String CONTENT_TYPE_PREFIX = "image/";
 
+    @Value("${bff.url}")
+    private String bffUrl;
+
     @Override
     public SaveMediaResponse apply(MultipartFile image) {
         String fileFormat = image.getContentType().substring(CONTENT_TYPE_PREFIX.length());
@@ -38,8 +42,8 @@ public class ImageProcessor implements MediaProcessor {
             String imageName = saveImage(fileFormat, image.getInputStream(), image.getContentType(), image.getSize());
 
             return SaveMediaResponse.builder()
-                    .mediaUrl(imageName)
-                    .previewUrl(previewImageName)
+                    .mediaUrl(buildLink(imageName))
+                    .previewUrl(buildLink(previewImageName))
                     .build();
         } catch (IOException e) {
             throw new ImageProcessorException("Cannot process image", e);
@@ -69,6 +73,10 @@ public class ImageProcessor implements MediaProcessor {
         minioClientService.upload(saveMediaArgs);
 
         return fileName;
+    }
+
+    private String buildLink(String fileName) {
+        return "%s/media/%s/%s".formatted(bffUrl, IMAGE_BUCKET, fileName);
     }
 
     @Override

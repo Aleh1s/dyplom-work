@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ua.aleh1s.mediaservice.domain.Resource;
-import ua.aleh1s.mediaservice.dto.GetMediaArgs;
 import ua.aleh1s.mediaservice.dto.SaveMediaResponse;
 import ua.aleh1s.mediaservice.service.MediaService;
 

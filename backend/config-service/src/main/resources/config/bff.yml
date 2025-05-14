@@ -9,6 +9,15 @@ spring:
           issuer-uri: http://localhost:8080/realms/ReShare
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: 'http://localhost:3000'
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+            allowed-headers: '*'
       default-filters:
         - TokenRelay
       routes:

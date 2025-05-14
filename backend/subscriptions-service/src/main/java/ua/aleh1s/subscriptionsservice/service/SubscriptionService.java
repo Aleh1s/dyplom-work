@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.aleh1s.subscriptionsservice.domain.SubscriptionEntity;
 import ua.aleh1s.subscriptionsservice.domain.SubscriptionPlanEntity;
+import ua.aleh1s.subscriptionsservice.domain.SubscriptionType;
 import ua.aleh1s.subscriptionsservice.dto.*;
 import ua.aleh1s.subscriptionsservice.exception.SubscriptionNotFoundException;
 import ua.aleh1s.subscriptionsservice.exception.SubscriptionPlanAlreadyExistsException;
@@ -18,9 +19,9 @@ import ua.aleh1s.subscriptionsservice.repository.SubscriptionPlanRepository;
 import ua.aleh1s.subscriptionsservice.repository.SubscriptionRepository;
 import ua.aleh1s.subscriptionsservice.utils.MoneyUtils;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -35,7 +36,7 @@ public class SubscriptionService {
     private final SubscriptionMapper subscriptionMapper;
 
     @Transactional
-    public SubscriptionPlan createSubscriptionPlan(CreateSubscriptionPlan createSubscriptionPlan) {
+    public SubscriptionPlanEntity createSubscriptionPlan(CreateSubscriptionPlan createSubscriptionPlan) {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         String userId = jwt.getClaimAsString(ClaimsNames.SUBJECT);
@@ -55,15 +56,34 @@ public class SubscriptionService {
                 ))
                 .build();
 
-        subscriptionPlan = subscriptionPlanRepository.save(subscriptionPlan);
-
-        return subscriptionPlanMapper.toSubscriptionPlan(subscriptionPlan);
+        return subscriptionPlanRepository.save(subscriptionPlan);
     }
 
     public SubscriptionPlan getSubscriptionPlanByUserId(String userId) {
         return subscriptionPlanMapper.toSubscriptionPlan(
                 getSubscriptionPlanEntityByUserId(userId)
         );
+    }
+
+    @Transactional
+    public SubscriptionPlan getMySubscriptionPlanOrCreateNew() {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        String userId = jwt.getClaimAsString(ClaimsNames.SUBJECT);
+
+        SubscriptionPlanEntity subscriptionPlanEntity = subscriptionPlanRepository.findSubscriptionPlanEntityByUserId(userId)
+                .orElseGet(() -> {
+                    CreateSubscriptionPlan createSubscriptionPlan = CreateSubscriptionPlan.builder()
+                            .type(SubscriptionType.FREE)
+                            .price(BigDecimal.ZERO)
+                            .build();
+
+                    return createSubscriptionPlan(createSubscriptionPlan);
+                });
+
+        return subscriptionPlanMapper.toSubscriptionPlan(subscriptionPlanEntity);
     }
 
     @Transactional

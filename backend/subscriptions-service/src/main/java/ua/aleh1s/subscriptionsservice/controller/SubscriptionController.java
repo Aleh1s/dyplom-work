@@ -13,21 +13,19 @@ public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
 
-    @PostMapping
-    public ResponseEntity<SubscriptionPlan> createSubscriptionPlan(
-            @RequestBody CreateSubscriptionPlan createSubscriptionPlan
-    ) {
-        return ResponseEntity.ok(
-                subscriptionService.createSubscriptionPlan(createSubscriptionPlan)
-        );
-    }
-
     @PutMapping
     public ResponseEntity<SubscriptionPlan> updateSubscriptionPlan(
             @RequestBody UpdateSubscriptionPlan updateSubscriptionPlan
     ) {
         return ResponseEntity.ok(
                 subscriptionService.updateSubscriptionPlan(updateSubscriptionPlan)
+        );
+    }
+
+    @PostMapping("/plan")
+    public ResponseEntity<SubscriptionPlan> getMySubscriptionPlan() {
+        return ResponseEntity.ok(
+                subscriptionService.getMySubscriptionPlanOrCreateNew()
         );
     }
 
