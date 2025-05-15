@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaveMediaResponse {
+public class SaveSafeMediaResponse {
     private String mediaUrl;
     private String previewUrl;
+    private String safePreviewUrl;
 }

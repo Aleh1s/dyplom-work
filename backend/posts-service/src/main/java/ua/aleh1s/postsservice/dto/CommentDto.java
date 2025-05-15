@@ -8,6 +8,7 @@ import java.time.Instant;
 public class CommentDto {
     private String id;
     private String content;
+    private String postId;
     private Instant createdAt;
-    private UserProfile owner;
+    private UserDto owner;
 }

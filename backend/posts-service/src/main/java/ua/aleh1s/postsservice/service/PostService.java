@@ -1,9 +1,9 @@
 package ua.aleh1s.postsservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -12,17 +12,19 @@ import ua.aleh1s.postsservice.client.ContentApiClient;
 import ua.aleh1s.postsservice.client.UsersApiClient;
 import ua.aleh1s.postsservice.dto.*;
 import ua.aleh1s.postsservice.jwt.ClaimsNames;
+import ua.aleh1s.postsservice.mapper.PopulatedPostDtoMapper;
 import ua.aleh1s.postsservice.mapper.PostDtoMapper;
 import ua.aleh1s.postsservice.mapper.PostMapper;
+import ua.aleh1s.postsservice.model.Comment;
 import ua.aleh1s.postsservice.model.Post;
 import ua.aleh1s.postsservice.repository.PostRepository;
 import ua.aleh1s.postsservice.utils.CommonGenerator;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.*;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +36,9 @@ public class PostService {
     private final UsersApiClient usersApiClient;
     private final ContentApiClient contentApiClient;
     private final PostDtoMapper postDtoMapper;
-    private final MongoTemplate mongoTemplate;
+    private final PopulatedPostDtoMapper populatedPostDtoMapper;
+    private final LikeService likeService;
+    private CommentService commentService;
 
     @Transactional
     public PostDto save(NewPost newPost) {
@@ -44,8 +48,12 @@ public class PostService {
 
         String ownerId = jwt.getClaimAsString(ClaimsNames.SUBJECT);
 
-        ContentDto content = contentApiClient.getContentById(newPost.getContentId());
+        SearchContentRequest contentSearchRequest = SearchContentRequest.builder()
+                .ids(newPost.getContentIds())
+                .build();
+
         UserDto user = usersApiClient.getUsers(null, Set.of(ownerId)).getFirst();
+        List<ContentDto> content = contentApiClient.getAllBySearchRequest(contentSearchRequest);
 
         Post post = postMapper.map(newPost);
 
@@ -62,11 +70,35 @@ public class PostService {
         return repository.existsById(id);
     }
 
-    public List<PostDto> getPostsByRequest(GetPostsRequest request) {
-        List<Post> posts = mongoTemplate.find(postMapper.createQuery(request), Post.class);
+//    public List<PostDto> getPostsByRequest(GetPostsRequest request) {
+//        List<Post> posts = mongoTemplate.find(postMapper.createQuery(request), Post.class);
+//
+//        return populatePosts(posts);
+//    }
 
+    public Page<PopulatedPostDto> getPostsFeed(GetPostsFeedRequest request) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(),
+                Sort.by(Sort.Direction.DESC, Post.Fields.createdAt));
+
+        Page<Post> posts;
+        if (nonNull(request.getPostType())) {
+            posts = repository.findAllByType(request.getPostType(), pageable);
+        } else {
+            posts = repository.findAll(pageable);
+        }
+
+        List<PopulatedPostDto> populatedPosts = populatePosts(posts.toList());
+
+        return new PageImpl<>(populatedPosts, pageable, posts.getTotalElements());
+    }
+
+    private List<PopulatedPostDto> populatePosts(Collection<Post> posts) {
+        Set<String> postsIds = posts.stream()
+                .map(Post::getId)
+                .collect(Collectors.toSet());
         Set<String> contentIds = posts.stream()
-                .map(Post::getContentId)
+                .map(Post::getContentIds)
+                .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
         Set<String> ownerIds = posts.stream()
                 .map(Post::getOwnerId)
@@ -81,17 +113,26 @@ public class PostService {
         Map<String, ContentDto> contentById = contentApiClient.getAllBySearchRequest(contentSearchRequest).stream()
                 .collect(Collectors.toMap(ContentDto::getId, Function.identity()));
 
+        Set<String> userLikes = likeService.getUserLikes(postsIds);
+        Map<String, Long> likesCountByPostId = likeService.getLikesCountByPostId(postsIds);
+        Map<String, List<CommentDto>> commentsByPostId = commentService.getCommentsByPostId(postsIds);
+
         return posts.stream()
-                .map(post -> postDtoMapper.map(
+                .map(post -> populatedPostDtoMapper.map(
                         post,
+                        post.getContentIds().stream()
+                                .map(contentById::get)
+                                .toList(),
                         ownerById.get(post.getOwnerId()),
-                        contentById.get(post.getContentId())
+                        userLikes.contains(post.getId()),
+                        likesCountByPostId.get(post.getId()),
+                        commentsByPostId.get(post.getId())
                 ))
                 .toList();
     }
 
-//    public Post getById(String id) {
-//        return repository.findById(id)
-//                .orElseThrow(() -> new NotFoundException("Post not found with id: %s".formatted(id)));
-//    }
+    @Autowired
+    public void setCommentService(@Lazy CommentService commentService) {
+        this.commentService = commentService;
+    }
 }

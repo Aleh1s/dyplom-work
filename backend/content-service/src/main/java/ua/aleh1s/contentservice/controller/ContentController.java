@@ -39,4 +39,12 @@ public class ContentController {
         Content content = service.getContentById(id);
         return ResponseEntity.ok(mapper.map(content));
     }
+
+    @GetMapping("/my-gallery")
+    public ResponseEntity<List<ContentDto>> getMyGallery() {
+        List<ContentDto> content = service.getMyGallery().stream()
+                .map(mapper::map)
+                .toList();
+        return ResponseEntity.ok(content);
+    }
 }

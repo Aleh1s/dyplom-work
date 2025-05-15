@@ -17,6 +17,7 @@ import ua.aleh1s.contentservice.model.Content;
 import ua.aleh1s.contentservice.repository.ContentRepository;
 import ua.aleh1s.contentservice.utils.CommonGenerator;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -52,5 +53,15 @@ public class ContentService {
     public Content getContentById(String id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Content with id %s not found".formatted(id)));
+    }
+
+    public List<Content> getMyGallery() {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        String ownerId = jwt.getClaimAsString(ClaimsNames.SUBJECT);
+
+        return repository.findAllByOwnerId(ownerId);
     }
 }

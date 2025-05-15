@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>ua.aleh1s</groupId>
-	<artifactId>saveMediaArgs-service</artifactId>
+	<artifactId>media-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>saveMediaArgs-service</name>
 	<description>saveMediaArgs-service</description>

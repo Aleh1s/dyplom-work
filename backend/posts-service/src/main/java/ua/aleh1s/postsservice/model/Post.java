@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -19,7 +20,7 @@ public class Post {
     private String id;
     private String description;
     private String ownerId;
-    private String contentId;
+    private Set<String> contentIds;
     private PostType type;
     private Instant createdAt;
 }

@@ -1,18 +1,15 @@
 package ua.aleh1s.mediaservice.service.handler;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ua.aleh1s.mediaservice.domain.Metadata;
 import ua.aleh1s.mediaservice.dto.Image;
-import ua.aleh1s.mediaservice.dto.SaveMediaArgs;
-import ua.aleh1s.mediaservice.dto.SaveMediaResponse;
+import ua.aleh1s.mediaservice.dto.SaveSafeMediaResponse;
 import ua.aleh1s.mediaservice.exception.ImageProcessorException;
-import ua.aleh1s.mediaservice.service.MetadataService;
-import ua.aleh1s.mediaservice.service.MinioClientService;
+import ua.aleh1s.mediaservice.service.MediaService;
 import ua.aleh1s.mediaservice.utils.BlurImageComponent;
-import ua.aleh1s.mediaservice.utils.IdDateGeneratorComponent;
 
 import java.io.*;
 import java.util.Objects;
@@ -20,63 +17,33 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class ImageProcessor implements MediaProcessor {
-    private final MinioClientService minioClientService;
-    private final IdDateGeneratorComponent generator;
     private final BlurImageComponent blurImage;
-    private final MetadataService metadataService;
+    private MediaService mediaService;
 
     private static final String IMAGE_BUCKET = "images";
     private static final String CONTENT_TYPE_PREFIX = "image/";
 
-    @Value("${bff.url}")
-    private String bffUrl;
-
     @Override
-    public SaveMediaResponse apply(MultipartFile image) {
+    public SaveSafeMediaResponse apply(MultipartFile image) {
         String fileFormat = image.getContentType().substring(CONTENT_TYPE_PREFIX.length());
 
         try {
             Image blurredImage = blurImage.blurImage(image.getInputStream(), fileFormat);
 
-            String previewImageName = saveImage(fileFormat, blurredImage.getData(), image.getContentType(), blurredImage.getSize());
-            String imageName = saveImage(fileFormat, image.getInputStream(), image.getContentType(), image.getSize());
+            String previewImageName = mediaService.saveImage(fileFormat, blurredImage.getData(), image.getContentType(), blurredImage.getSize());
+            String imageName = mediaService.saveImage(fileFormat, image.getInputStream(), image.getContentType(), image.getSize());
 
-            return SaveMediaResponse.builder()
-                    .mediaUrl(buildLink(imageName))
-                    .previewUrl(buildLink(previewImageName))
+            String imageUrl = mediaService.buildLink(imageName, IMAGE_BUCKET);
+            String safePreviewUrl = mediaService.buildLink(previewImageName, IMAGE_BUCKET);
+
+            return SaveSafeMediaResponse.builder()
+                    .mediaUrl(imageUrl)
+                    .previewUrl(imageUrl)
+                    .safePreviewUrl(safePreviewUrl)
                     .build();
         } catch (IOException e) {
             throw new ImageProcessorException("Cannot process image", e);
         }
-    }
-
-    private String saveImage(String fileFormat, InputStream data, String contentType, long size) {
-        String fileName = "%s.%s".formatted(generator.generateId(), fileFormat);
-
-        Metadata metadata = Metadata.builder()
-                .fileName(fileName)
-                .bucketName(IMAGE_BUCKET)
-                .contentType(contentType)
-                .size(size)
-                .build();
-
-        metadataService.saveMetadata(metadata);
-
-        SaveMediaArgs saveMediaArgs = SaveMediaArgs.builder()
-                .bucket(IMAGE_BUCKET)
-                .fileName(fileName)
-                .data(data)
-                .contentType(contentType)
-                .size(size)
-                .build();
-
-        minioClientService.upload(saveMediaArgs);
-
-        return fileName;
-    }
-
-    private String buildLink(String fileName) {
-        return "%s/media/%s/%s".formatted(bffUrl, IMAGE_BUCKET, fileName);
     }
 
     @Override
@@ -88,5 +55,10 @@ public class ImageProcessor implements MediaProcessor {
         }
 
         return contentType.startsWith(CONTENT_TYPE_PREFIX);
+    }
+
+    @Autowired
+    public void setMediaService(@Lazy MediaService mediaService) {
+        this.mediaService = mediaService;
     }
 }

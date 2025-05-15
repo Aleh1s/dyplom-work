@@ -1,18 +1,23 @@
 package ua.aleh1s.postsservice.dto;
 
+import lombok.Builder;
 import lombok.Data;
 import ua.aleh1s.postsservice.model.PostType;
 
 import java.time.Instant;
+import java.util.List;
 
 @Data
+@Builder
 public class PopulatedPostDto {
     private String id;
     private String description;
     private Instant createdAt;
     private PostType type;
-    private int likesCount;
-    private boolean liked;
-    private UserProfile owner;
-    private ContentDto content;
+    private long likesCount;
+    private long commentsCount;
+    private boolean hasUserLike;
+    private UserDto owner;
+    private List<Media> media;
+    private List<CommentDto> comments;
 }
