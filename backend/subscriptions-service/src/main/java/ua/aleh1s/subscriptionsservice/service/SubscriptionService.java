@@ -1,5 +1,6 @@
 package ua.aleh1s.subscriptionsservice.service;
 
+import com.nimbusds.jose.util.Pair;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -9,6 +10,7 @@ import ua.aleh1s.subscriptionsservice.domain.SubscriptionEntity;
 import ua.aleh1s.subscriptionsservice.domain.SubscriptionPlanEntity;
 import ua.aleh1s.subscriptionsservice.domain.SubscriptionType;
 import ua.aleh1s.subscriptionsservice.dto.*;
+import ua.aleh1s.subscriptionsservice.exception.ResourceConflictException;
 import ua.aleh1s.subscriptionsservice.exception.SubscriptionNotFoundException;
 import ua.aleh1s.subscriptionsservice.exception.SubscriptionPlanAlreadyExistsException;
 import ua.aleh1s.subscriptionsservice.exception.SubscriptionPlanNotFoundException;
@@ -17,13 +19,13 @@ import ua.aleh1s.subscriptionsservice.mapper.SubscriptionMapper;
 import ua.aleh1s.subscriptionsservice.mapper.SubscriptionPlanMapper;
 import ua.aleh1s.subscriptionsservice.repository.SubscriptionPlanRepository;
 import ua.aleh1s.subscriptionsservice.repository.SubscriptionRepository;
+import ua.aleh1s.subscriptionsservice.utils.CommonGenerator;
 import ua.aleh1s.subscriptionsservice.utils.MoneyUtils;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +35,7 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final SubscriptionPlanMapper subscriptionPlanMapper;
     private final SubscriptionMapper subscriptionMapper;
+    private final CommonGenerator commonGenerator;
 
     @Transactional
     public SubscriptionPlanEntity createSubscriptionPlan(CreateSubscriptionPlan createSubscriptionPlan) {
@@ -120,6 +123,11 @@ public class SubscriptionService {
         String subscriberId = jwt.getClaimAsString(ClaimsNames.SUBJECT);
         String subscribeOnId = subscribeRequest.getSubscribeOnId();
 
+        Optional<SubscriptionEntity> activeSubscription = findActiveSubscription(subscriberId, subscribeOnId);
+        if (activeSubscription.isPresent()) {
+            throw new ResourceConflictException("subscription with id %s already exists".formatted(subscribeOnId));
+        }
+
         SubscriptionPlanEntity subscriptionPlanEntity = getSubscriptionPlanEntityByUserId(subscribeOnId);
 
         // todo: payment process
@@ -142,31 +150,84 @@ public class SubscriptionService {
         return subscriptionMapper.toSubscription(subscriptionEntity);
     }
 
+    private Optional<SubscriptionEntity> findActiveSubscription(String subscriberId, String subscribedOnId) {
+        return subscriptionRepository.findSubscriptionEntityBySubscriberIdAndSubscribedOnIdAndExpiredAtAfter(
+                subscriberId, subscribedOnId, commonGenerator.now());
+    }
+
     public Subscription getActiveSubscription(String subscribedOnId) {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         String subscriberId = jwt.getClaimAsString(ClaimsNames.SUBJECT);
-        Optional<SubscriptionEntity> subscriptionOptional = subscriptionRepository
-                .findSubscriptionBySubscriberIdAndSubscribedOnId(subscriberId, subscribedOnId);
 
+        Optional<SubscriptionEntity> subscriptionOptional = findActiveSubscription(subscriberId, subscribedOnId);
         if (subscriptionOptional.isEmpty()) {
             throw new SubscriptionNotFoundException("on user with id %s".formatted(subscribedOnId));
         }
 
-        SubscriptionEntity subscription = subscriptionOptional.get();
-        if (subscription.getExpiredAt().isBefore(Instant.now())) {
-            subscriptionRepository.delete(subscription);
-            throw new SubscriptionNotFoundException("on user with id %s".formatted(subscribedOnId));
-        }
-
-        return subscriptionMapper.toSubscription(subscription);
+        return subscriptionMapper.toSubscription(subscriptionOptional.get());
     }
 
     public SubscribersInfo getSubscribersInfo(String userId) {
-        long totalSubscribers = subscriptionRepository.countAllBySubscribedOnId(userId);
+        long totalSubscribers = countActiveSubscriptionsBySubscribedOnId(userId);
 
         return SubscribersInfo.builder()
                 .totalSubscribers(totalSubscribers)
                 .build();
+    }
+
+    private long countActiveSubscriptionsBySubscribedOnId(String subscribedOnId) {
+        return subscriptionRepository.countAllBySubscribedOnIdAndExpiredAtAfter(
+                subscribedOnId, commonGenerator.now());
+    }
+
+    @Transactional
+    public List<SubscriptionEntity> getActiveSubscriptionsBySubscriberId(String subscriberId) {
+        return subscriptionRepository.findSubscriptionEntitiesBySubscriberIdAndExpiredAtAfter(
+                subscriberId, commonGenerator.now());
+    }
+
+    public SubscriptionsStatistics getMonthSubscriptionsStatistics(String userId) {
+        long totalActiveSubscriptions = countActiveSubscriptionsBySubscribedOnId(userId);
+
+        ZoneId zoneId = ZoneId.systemDefault();
+
+        LocalDate today = LocalDate.now(zoneId);
+        LocalDate startOfWeek = today.with(DayOfWeek.MONDAY);
+        LocalDate endOfWeek = today.with(DayOfWeek.SUNDAY);
+
+        Instant startOfWeekInstant = startOfWeek.atStartOfDay(zoneId).toInstant();
+        Instant endOfWeekInstant = endOfWeek.atTime(LocalTime.MAX).atZone(zoneId).toInstant();
+
+        long newSubscriptionsThisWeek = subscriptionRepository.countAllBySubscribedOnIdAndCreatedAtBetween(
+            userId, startOfWeekInstant, endOfWeekInstant
+        );
+
+        List<KeyValue<Month, Integer>> subscriptionsCountByMonth =
+                getSubscriptionsCountByMonthBySubscribedOnId(userId);
+
+        return SubscriptionsStatistics.builder()
+                .totalActiveSubscriptions(totalActiveSubscriptions)
+                .newThisWeekActiveSubscriptionsCount(newSubscriptionsThisWeek)
+                .subscribersCountByMonth(subscriptionsCountByMonth)
+                .build();
+    }
+
+    private List<KeyValue<Month, Integer>> getSubscriptionsCountByMonthBySubscribedOnId(String subscribedOnId) {
+        int currentYear = LocalDate.now().getYear();
+
+        Map<Month, Integer> subscriptionsByMonth = new HashMap<>();
+        subscriptionRepository.findSubscriptionEntitiesBySubscribedOnIdAndCreatedAtYear(subscribedOnId, currentYear).forEach(subscription -> {
+            Month month = subscription.getCreatedAt()
+                    .atZone(ZoneId.systemDefault())
+                    .getMonth();
+
+            subscriptionsByMonth.compute(month, (k, v) -> v == null ? 1 : v + 1);
+        });
+
+        return subscriptionsByMonth.entrySet().stream()
+                .map(entry -> new KeyValue<>(entry.getKey(), entry.getValue()))
+                .sorted(Comparator.comparingInt(v -> v.key().getValue()))
+                .collect(Collectors.toList());
     }
 }

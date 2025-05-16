@@ -3,6 +3,7 @@ package ua.aleh1s.postsservice.repository;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import ua.aleh1s.postsservice.model.Like;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
@@ -12,4 +13,6 @@ public interface LikeRepository extends MongoRepository<Like, String> {
     void deleteLikeByUserIdAndPostId(String userId, String postId);
 
     List<Like> getLikesByPostIdInAndUserId(Collection<String> postIds, String userId);
+
+    long countAllByPostIdInAndCreatedAtBetween(Collection<String> postIds, Instant createdAtAfter, Instant createdAtBefore);
 }

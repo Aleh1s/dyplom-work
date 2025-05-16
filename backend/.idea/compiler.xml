@@ -35,6 +35,15 @@
         </processorPath>
         <module name="media-service" />
       </profile>
+      <profile name="Annotation profile for statistics-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+        </processorPath>
+        <module name="statistics-service" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="auth-service" target="24" />
@@ -49,6 +58,7 @@
       <module name="discovery-service" options="-parameters" />
       <module name="media-service" options="-parameters" />
       <module name="posts-service" options="-parameters" />
+      <module name="statistics-service" options="-parameters" />
       <module name="subscriptions-service" options="-parameters" />
       <module name="users-service" options="-parameters" />
     </option>

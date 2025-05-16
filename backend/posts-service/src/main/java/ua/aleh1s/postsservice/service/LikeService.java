@@ -16,6 +16,7 @@ import ua.aleh1s.postsservice.model.Like;
 import ua.aleh1s.postsservice.repository.LikeRepository;
 import ua.aleh1s.postsservice.utils.CommonGenerator;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,7 @@ public class LikeService {
                 .id(generator.uuid())
                 .postId(postId)
                 .userId(userId)
+                .createdAt(generator.now())
                 .build();
 
         likeRepository.save(like);
@@ -98,5 +100,9 @@ public class LikeService {
         postIds.forEach(postId -> resultMap.putIfAbsent(postId, 0L));
 
         return resultMap;
+    }
+
+    public long countLikesByPostIdsAndCreatedAtBetween(Set<String> postIds, Instant from, Instant to) {
+        return likeRepository.countAllByPostIdInAndCreatedAtBetween(postIds, from, to);
     }
 }

@@ -51,5 +51,11 @@ spring:
             - Path=/posts/**
           filters:
             - PrefixPath=/api/v1
+        - id: statistics-route
+          uri: ${STATISTICS_ROUTE_URI:http://localhost:8087}
+          predicates:
+            - Path=/statistics/**
+          filters:
+            - PrefixPath=/api/v1
 keycloak:
   client-id: reshare-client

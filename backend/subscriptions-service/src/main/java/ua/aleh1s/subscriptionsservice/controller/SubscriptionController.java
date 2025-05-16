@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.aleh1s.subscriptionsservice.dto.*;
+import ua.aleh1s.subscriptionsservice.mapper.SubscriptionMapper;
 import ua.aleh1s.subscriptionsservice.service.SubscriptionService;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -12,8 +15,9 @@ import ua.aleh1s.subscriptionsservice.service.SubscriptionService;
 public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
+    private final SubscriptionMapper subscriptionMapper;
 
-    @PutMapping
+    @PutMapping("/plan")
     public ResponseEntity<SubscriptionPlan> updateSubscriptionPlan(
             @RequestBody UpdateSubscriptionPlan updateSubscriptionPlan
     ) {
@@ -29,7 +33,7 @@ public class SubscriptionController {
         );
     }
 
-    @GetMapping
+    @GetMapping("/plan")
     public ResponseEntity<SubscriptionPlan> getSubscriptionPlan(
             @RequestParam String userId
     ) {
@@ -62,6 +66,24 @@ public class SubscriptionController {
     ) {
         return ResponseEntity.ok(
                 subscriptionService.getSubscribersInfo(userId)
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Subscription>> getSubscriptions(
+            @RequestParam String subscriberId
+    ) {
+        List<Subscription> subscriptions = subscriptionService.getActiveSubscriptionsBySubscriberId(subscriberId).stream()
+                .map(subscriptionMapper::toSubscription)
+                .toList();
+
+        return ResponseEntity.ok(subscriptions);
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<SubscriptionsStatistics> getMonthSubscriptionsStatistics(@RequestParam String userId) {
+        return ResponseEntity.ok(
+                subscriptionService.getMonthSubscriptionsStatistics(userId)
         );
     }
 }

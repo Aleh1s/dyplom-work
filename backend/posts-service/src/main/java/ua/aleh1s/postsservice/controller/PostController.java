@@ -61,4 +61,23 @@ public class PostController {
         Page<PopulatedPostDto> posts = postService.getPostsFeed(request);
         return ResponseEntity.ok(posts);
     }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<PostsStatistics> getPostsStatistics(
+            @RequestParam String ownerId
+    ) {
+        return ResponseEntity.ok(
+                postService.getPostsStatisticsByOwnerId(ownerId)
+        );
+    }
+
+    @GetMapping("/latest")
+    public ResponseEntity<List<PostWithCounts>> getLatestPosts(
+            @RequestParam String ownerId,
+            @RequestParam(required = false, defaultValue = "3") Integer limit
+    ) {
+        return ResponseEntity.ok(
+                postService.getLatestPosts(ownerId, limit)
+        );
+    }
 }

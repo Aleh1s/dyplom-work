@@ -25,6 +25,7 @@ import ua.aleh1s.postsservice.repository.CommentRepository;
 import ua.aleh1s.postsservice.utils.CommonGenerator;
 
 import java.lang.classfile.CompoundElement;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -80,5 +81,32 @@ public class CommentService {
         postIds.forEach(postId -> commentsByPostId.putIfAbsent(postId, new ArrayList<>()));
 
         return commentsByPostId;
+    }
+
+    public long countCommentsByPostIdsAndCreatedAtBetween(Set<String> postIds, Instant from, Instant to) {
+        return commentRepository.countCommentsByPostIdInAndCreatedAtBetween(postIds, from, to);
+    }
+
+    public Map<String, Long> getCommentsCountByPostId(Set<String> postsIds) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where(Comment.Fields.postId).in(postsIds)),
+                Aggregation.group(Comment.Fields.postId).count().as("count"),
+                Aggregation.project("count").and("_id").as(Comment.Fields.postId)
+        );
+
+        AggregationResults<Document> results = mongoTemplate.aggregate(
+                aggregation, Comment.COLLECTION_NAME, Document.class
+        );
+
+        Map<String, Long> resultMap = new HashMap<>();
+        for (Document doc : results.getMappedResults()) {
+            String postId = doc.getString(Comment.Fields.postId);
+            Number count = doc.get("count", Number.class);
+            resultMap.put(postId, count.longValue());
+        }
+
+        postsIds.forEach(postId -> resultMap.putIfAbsent(postId, 0L));
+
+        return resultMap;
     }
 }

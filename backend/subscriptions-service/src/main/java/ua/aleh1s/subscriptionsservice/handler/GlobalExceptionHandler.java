@@ -4,10 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import ua.aleh1s.subscriptionsservice.exception.ApiError;
-import ua.aleh1s.subscriptionsservice.exception.SubscriptionNotFoundException;
-import ua.aleh1s.subscriptionsservice.exception.SubscriptionPlanAlreadyExistsException;
-import ua.aleh1s.subscriptionsservice.exception.SubscriptionPlanNotFoundException;
+import ua.aleh1s.subscriptionsservice.exception.*;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -40,6 +37,17 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(apiError);
+
+    }
+
+    @ExceptionHandler(ResourceConflictException.class)
+    public ResponseEntity<ApiError> handleException(ResourceConflictException e) {
+        ApiError apiError = ApiError.builder()
+                .description(e.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(apiError);
 
     }

@@ -7,6 +7,8 @@ import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 @Builder
@@ -19,4 +21,5 @@ public class Like {
     private String id;
     private String postId;
     private String userId;
+    private Instant createdAt;
 }

@@ -17,6 +17,7 @@ public class PopulatedPostDto {
     private long likesCount;
     private long commentsCount;
     private boolean hasUserLike;
+    private boolean hasUserSubscription;
     private UserDto owner;
     private List<Media> media;
     private List<CommentDto> comments;
