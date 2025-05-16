@@ -146,4 +146,10 @@ public class UserService {
                 .map(userMapper::toUser)
                 .toList();
     }
+
+    public List<User> findUsersByUsernameLike(String username) {
+        return userRepository.findUserEntitiesByUsernameLike(username).stream()
+                .map(userMapper::toUser)
+                .toList();
+    }
 }

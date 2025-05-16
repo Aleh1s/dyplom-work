@@ -38,6 +38,17 @@ public class UserController {
         );
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<User>> findUsersByRequest(@RequestParam String username) {
+        if (Objects.isNull(username) || username.isBlank() || username.length() < 2) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        return ResponseEntity.ok(
+                userService.findUsersByUsernameLike(username)
+        );
+    }
+
 //    @GetMapping("/{username}")
 //    public ResponseEntity<UserProfile> getUserProfileByUsername(@PathVariable String username) {
 //        return ResponseEntity.ok(
