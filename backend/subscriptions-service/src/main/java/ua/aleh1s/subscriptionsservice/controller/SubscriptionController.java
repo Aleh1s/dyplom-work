@@ -7,6 +7,7 @@ import ua.aleh1s.subscriptionsservice.dto.*;
 import ua.aleh1s.subscriptionsservice.mapper.SubscriptionMapper;
 import ua.aleh1s.subscriptionsservice.service.SubscriptionService;
 
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -84,6 +85,17 @@ public class SubscriptionController {
     public ResponseEntity<SubscriptionsStatistics> getMonthSubscriptionsStatistics(@RequestParam String userId) {
         return ResponseEntity.ok(
                 subscriptionService.getMonthSubscriptionsStatistics(userId)
+        );
+    }
+
+    @GetMapping("/analytics")
+    public ResponseEntity<SubscriptionAnalytics> getSubscriptionAnalytics(
+            @RequestParam String userId,
+            @RequestParam Instant from,
+            @RequestParam Instant to
+    ) {
+        return ResponseEntity.ok(
+                subscriptionService.getSubscriptionAnalytics(userId, from, to)
         );
     }
 }

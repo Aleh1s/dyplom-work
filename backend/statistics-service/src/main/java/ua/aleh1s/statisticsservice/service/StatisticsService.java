@@ -1,12 +1,13 @@
 package ua.aleh1s.statisticsservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ua.aleh1s.statisticsservice.client.PostsApiClient;
 import ua.aleh1s.statisticsservice.client.SubscriptionsApiClient;
-import ua.aleh1s.statisticsservice.dto.UserOverviewStatistics;
-import ua.aleh1s.statisticsservice.dto.PostsStatistics;
-import ua.aleh1s.statisticsservice.dto.SubscriptionsStatistics;
+import ua.aleh1s.statisticsservice.dto.*;
+
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,17 @@ public class StatisticsService {
                 .subscribersCountByMonth(subscriptionsStatistics.getSubscribersCountByMonth())
                 .engagement(postsStatistics.getEngagement())
                 .engagementGrowthPercentage(postsStatistics.getEngagementGrowthPercentage())
+                .build();
+    }
+
+    public UserAnalytics getUserAnalytics(String userId, Instant from, Instant to) {
+        SubscriptionAnalytics subscriptionAnalytics = subscriptionsApiClient.getSubscriptionAnalytics(userId, from, to);
+        UserPostAnalytics userPostAnalytics = postsApiClient.getAnalytics(userId, from, to);
+
+        return UserAnalytics.builder()
+                .subscriberGrowth(subscriptionAnalytics.getSubscriptionsCountByDate())
+                .commentsGrowth(userPostAnalytics.getCommentsCountByDate())
+                .likesGrowth(userPostAnalytics.getLikesCountByDate())
                 .build();
     }
 }

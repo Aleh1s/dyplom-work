@@ -11,10 +11,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.aleh1s.postsservice.client.UsersApiClient;
-import ua.aleh1s.postsservice.dto.CommentDto;
-import ua.aleh1s.postsservice.dto.NewComment;
-import ua.aleh1s.postsservice.dto.UserDto;
-import ua.aleh1s.postsservice.dto.UserProfile;
+import ua.aleh1s.postsservice.dto.*;
 import ua.aleh1s.postsservice.exception.NotFoundException;
 import ua.aleh1s.postsservice.jwt.ClaimsNames;
 import ua.aleh1s.postsservice.mapper.CommentDtoMapper;
@@ -26,6 +23,7 @@ import ua.aleh1s.postsservice.utils.CommonGenerator;
 
 import java.lang.classfile.CompoundElement;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -108,5 +106,25 @@ public class CommentService {
         postsIds.forEach(postId -> resultMap.putIfAbsent(postId, 0L));
 
         return resultMap;
+    }
+
+    public List<KeyValue<Instant, Integer>> getCommentsCountByDate(Set<String> postIds, Instant from, Instant to) {
+        Map<Instant, Integer> commentsCountByDate = new HashMap<>();
+
+        ZoneId zoneId = ZoneId.systemDefault();
+        commentRepository.findAllByPostIdInAndCreatedAtBetween(postIds, from, to).forEach(comment -> {
+            Instant date = comment.getCreatedAt()
+                    .atZone(zoneId)
+                    .toLocalDate()
+                    .atStartOfDay(zoneId)
+                    .toInstant();
+
+            commentsCountByDate.compute(date, (k, v) -> v == null ? 1 : v + 1);
+        });
+
+        return commentsCountByDate.entrySet().stream()
+                .map((e) -> new KeyValue<>(e.getKey(), e.getValue()))
+                .sorted(Comparator.comparing(KeyValue::key))
+                .collect(Collectors.toList());
     }
 }

@@ -247,4 +247,18 @@ public class PostService {
                     .build())
                 .getContent();
     }
+
+    public UserPostAnalytics getAnalytics(String ownerId, Instant from, Instant to) {
+        Set<String> postsIds = repository.findPostsByOwnerId(ownerId).stream()
+                .map(Post::getId)
+                .collect(Collectors.toSet());
+
+        List<KeyValue<Instant, Integer>> likesCountByDate = likeService.getLikesCountByDate(postsIds, from, to);
+        List<KeyValue<Instant, Integer>> commentsCountByDate = commentService.getCommentsCountByDate(postsIds, from, to);
+
+        return UserPostAnalytics.builder()
+                .likesCountByDate(likesCountByDate)
+                .commentsCountByDate(commentsCountByDate)
+                .build();
+    }
 }

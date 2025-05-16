@@ -24,6 +24,7 @@ import ua.aleh1s.subscriptionsservice.utils.MoneyUtils;
 
 import java.math.BigDecimal;
 import java.time.*;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -228,6 +229,34 @@ public class SubscriptionService {
         return subscriptionsByMonth.entrySet().stream()
                 .map(entry -> new KeyValue<>(entry.getKey(), entry.getValue()))
                 .sorted(Comparator.comparingInt(v -> v.key().getValue()))
+                .collect(Collectors.toList());
+    }
+
+    public SubscriptionAnalytics getSubscriptionAnalytics(String userId, Instant from , Instant to) {
+        List<KeyValue<Instant, Integer>> subscriptionsCountByDate = getSubscriptionsCountBySubscribedOnIdAndDateRange(userId, from, to);
+
+        return SubscriptionAnalytics.builder()
+                .subscriptionsCountByDate(subscriptionsCountByDate)
+                .build();
+    }
+
+    private List<KeyValue<Instant, Integer>> getSubscriptionsCountBySubscribedOnIdAndDateRange(String subscribedOnId, Instant from, Instant to) {
+        Map<Instant, Integer> subscriptionsCountByDate = new HashMap<>();
+
+        ZoneId zoneId = ZoneId.systemDefault();
+        subscriptionRepository.findSubscriptionEntitiesBySubscribedOnIdAndCreatedAtBetween(subscribedOnId, from, to).forEach(subscription -> {
+            Instant date = subscription.getCreatedAt()
+                    .atZone(zoneId)
+                    .toLocalDate()
+                    .atStartOfDay(zoneId)
+                    .toInstant();
+
+            subscriptionsCountByDate.compute(date, (k, v) -> v == null ? 1 : v + 1);
+        });
+
+        return subscriptionsCountByDate.entrySet().stream()
+                .map(e -> new KeyValue<>(e.getKey(), e.getValue()))
+                .sorted(Comparator.comparing(KeyValue::key))
                 .collect(Collectors.toList());
     }
 }

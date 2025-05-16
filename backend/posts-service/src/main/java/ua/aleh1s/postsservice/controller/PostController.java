@@ -9,6 +9,7 @@ import ua.aleh1s.postsservice.service.CommentService;
 import ua.aleh1s.postsservice.service.LikeService;
 import ua.aleh1s.postsservice.service.PostService;
 
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -78,6 +79,17 @@ public class PostController {
     ) {
         return ResponseEntity.ok(
                 postService.getLatestPosts(ownerId, limit)
+        );
+    }
+
+    @GetMapping("/analytics")
+    public ResponseEntity<UserPostAnalytics> getAnalytics(
+            @RequestParam String userId,
+            @RequestParam Instant from,
+            @RequestParam Instant to
+    ) {
+        return ResponseEntity.ok(
+                postService.getAnalytics(userId, from, to)
         );
     }
 }

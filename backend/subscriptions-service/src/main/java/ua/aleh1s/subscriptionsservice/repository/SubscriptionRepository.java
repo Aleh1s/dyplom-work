@@ -21,4 +21,6 @@ public interface SubscriptionRepository extends JpaRepository<SubscriptionEntity
 
     @Query("select s from SubscriptionEntity s where s.subscribedOnId = :subscribedOnId and extract(year from s.createdAt) = :year ")
     Stream<SubscriptionEntity> findSubscriptionEntitiesBySubscribedOnIdAndCreatedAtYear(@Param("subscribedOnId") String subscribedOnId, @Param("year") int year);
+
+    Stream<SubscriptionEntity> findSubscriptionEntitiesBySubscribedOnIdAndCreatedAtBetween(String subscribedOnId, Instant createdAtAfter, Instant createdAtBefore);
 }

@@ -2,12 +2,12 @@ package ua.aleh1s.statisticsservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ua.aleh1s.statisticsservice.dto.UserAnalytics;
 import ua.aleh1s.statisticsservice.dto.UserOverviewStatistics;
 import ua.aleh1s.statisticsservice.service.StatisticsService;
+
+import java.time.Instant;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +19,17 @@ public class StatisticsController {
     public ResponseEntity<UserOverviewStatistics> getUserOverviewStatistics(@PathVariable String userId) {
         return ResponseEntity.ok(
                 statisticsService.getUserOverviewStatistics(userId)
+        );
+    }
+
+    @GetMapping("/users/{userId}/analytics")
+    public ResponseEntity<UserAnalytics> getUserAnalytics(
+        @PathVariable String userId,
+        @RequestParam Instant from,
+        @RequestParam Instant to
+    ) {
+        return ResponseEntity.ok(
+                statisticsService.getUserAnalytics(userId, from, to)
         );
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.aleh1s.postsservice.dto.KeyValue;
 import ua.aleh1s.postsservice.exception.ResourcesConflictException;
 import ua.aleh1s.postsservice.jwt.ClaimsNames;
 import ua.aleh1s.postsservice.model.Like;
@@ -17,10 +18,8 @@ import ua.aleh1s.postsservice.repository.LikeRepository;
 import ua.aleh1s.postsservice.utils.CommonGenerator;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -104,5 +103,25 @@ public class LikeService {
 
     public long countLikesByPostIdsAndCreatedAtBetween(Set<String> postIds, Instant from, Instant to) {
         return likeRepository.countAllByPostIdInAndCreatedAtBetween(postIds, from, to);
+    }
+
+    public List<KeyValue<Instant, Integer>> getLikesCountByDate(Set<String> postIds, Instant from, Instant to) {
+        Map<Instant, Integer> likesCountByDate = new HashMap<>();
+
+        ZoneId zoneId = ZoneId.systemDefault();
+        likeRepository.findAllByPostIdInAndCreatedAtBetween(postIds, from, to).forEach(like -> {
+            Instant date = like.getCreatedAt()
+                    .atZone(zoneId)
+                    .toLocalDate()
+                    .atStartOfDay(zoneId)
+                    .toInstant();
+
+            likesCountByDate.compute(date, (k, v) -> v == null ? 1 : v + 1);
+        });
+
+        return likesCountByDate.entrySet().stream()
+                .map((e) -> new KeyValue<>(e.getKey(), e.getValue()))
+                .sorted(Comparator.comparing(KeyValue::key))
+                .collect(Collectors.toList());
     }
 }
