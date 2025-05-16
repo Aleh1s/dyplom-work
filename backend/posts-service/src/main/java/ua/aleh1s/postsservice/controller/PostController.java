@@ -49,11 +49,12 @@ public class PostController {
         likeService.unlike(postId);
         return ResponseEntity.ok().build();
     }
-//    @GetMapping
-//    public ResponseEntity<List<PostDto>> getPostsByRequest(GetPostsRequest request) {
-//        List<PostDto> posts = postService.getPostsByRequest(request);
-//        return ResponseEntity.ok(posts);
-//    }
+
+    @GetMapping
+    public ResponseEntity<List<PopulatedPostDto>> getPostsByRequest(GetPostsRequest request) {
+        List<PopulatedPostDto> posts = postService.getPostsByRequest(request);
+        return ResponseEntity.ok(posts);
+    }
 
     @GetMapping("/feed")
     public ResponseEntity<Page<PopulatedPostDto>> getPostsFeed(GetPostsFeedRequest request) {

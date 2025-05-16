@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface SubscriptionRepository extends JpaRepository<SubscriptionEntity, Long> {
     Optional<SubscriptionEntity> findSubscriptionBySubscriberIdAndSubscribedOnId(String subscriberId, String subscribedOnId);
+
+    long countAllBySubscribedOnId(String subscribedOnId);
 }

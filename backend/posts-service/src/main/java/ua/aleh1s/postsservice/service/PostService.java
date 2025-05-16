@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class PostService {
     private final PostDtoMapper postDtoMapper;
     private final PopulatedPostDtoMapper populatedPostDtoMapper;
     private final LikeService likeService;
+    private final MongoTemplate mongoTemplate;
     private CommentService commentService;
 
     @Transactional
@@ -70,11 +72,11 @@ public class PostService {
         return repository.existsById(id);
     }
 
-//    public List<PostDto> getPostsByRequest(GetPostsRequest request) {
-//        List<Post> posts = mongoTemplate.find(postMapper.createQuery(request), Post.class);
-//
-//        return populatePosts(posts);
-//    }
+    public List<PopulatedPostDto> getPostsByRequest(GetPostsRequest request) {
+        List<Post> posts = mongoTemplate.find(postMapper.createQuery(request), Post.class);
+
+        return populatePosts(posts);
+    }
 
     public Page<PopulatedPostDto> getPostsFeed(GetPostsFeedRequest request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(),

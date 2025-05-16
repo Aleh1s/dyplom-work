@@ -31,12 +31,19 @@ public class UserController {
         );
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<UserProfile> getUserProfileByUsername(@PathVariable String username) {
+    @GetMapping("/{id}")
+    public ResponseEntity<UserProfile> getUserProfile(@PathVariable String id) {
         return ResponseEntity.ok(
-                userService.getUserProfileByUsername(username)
+                userService.getUserProfileById(id)
         );
     }
+
+//    @GetMapping("/{username}")
+//    public ResponseEntity<UserProfile> getUserProfileByUsername(@PathVariable String username) {
+//        return ResponseEntity.ok(
+//                userService.getUserProfileByUsername(username)
+//        );
+//    }
 
     @GetMapping
     public ResponseEntity<List<User>> getUsers(
@@ -53,5 +60,4 @@ public class UserController {
 
         return ResponseEntity.ok(users);
     }
-
 }

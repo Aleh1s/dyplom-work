@@ -73,6 +73,11 @@ public class UserService {
         return userMapper.toUser(userEntity);
     }
 
+    public UserEntity getUserById(String id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
     public UserEntity getUserByUsername(String username) {
         return userRepository.findUserEntityByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
@@ -92,8 +97,8 @@ public class UserService {
         return userRepository.save(userEntity);
     }
 
-    public UserProfile getUserProfileByUsername(String username) {
-        UserEntity userEntity = getUserByUsername(username);
+    public UserProfile getUserProfileById(String id) {
+        UserEntity userEntity = getUserById(id);
 
         Subscription activeSubscription;
         try {
@@ -104,6 +109,19 @@ public class UserService {
 
         return userMapper.toUserProfile(userEntity, activeSubscription);
     }
+
+//    public UserProfile getUserProfileByUsername(String username) {
+//        UserEntity userEntity = getUserByUsername(username);
+//
+//        Subscription activeSubscription;
+//        try {
+//            activeSubscription = subscriptionsClient.getActiveSubscription(userEntity.getId());
+//        } catch (FeignException.NotFound e) {
+//            activeSubscription = null;
+//        }
+//
+//        return userMapper.toUserProfile(userEntity, activeSubscription);
+//    }
 
     public List<User> getUsersByUsernameLike(String usernameLike) {
         if (Objects.isNull(usernameLike) || usernameLike.isBlank()) {
@@ -120,13 +138,9 @@ public class UserService {
     }
 
     public List<User> getUsersByIds(Set<String> ids) {
-        System.out.println(1);
-
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return List.of();
         }
-
-        System.out.println(2);
 
         return userRepository.findUserEntitiesByIdIn(ids).stream()
                 .map(userMapper::toUser)

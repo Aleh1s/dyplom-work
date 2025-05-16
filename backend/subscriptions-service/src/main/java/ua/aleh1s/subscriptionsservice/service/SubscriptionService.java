@@ -29,7 +29,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class SubscriptionService {
-
     private final SubscriptionPlanRepository subscriptionPlanRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final SubscriptionPlanMapper subscriptionPlanMapper;
@@ -161,5 +160,13 @@ public class SubscriptionService {
         }
 
         return subscriptionMapper.toSubscription(subscription);
+    }
+
+    public SubscribersInfo getSubscribersInfo(String userId) {
+        long totalSubscribers = subscriptionRepository.countAllBySubscribedOnId(userId);
+
+        return SubscribersInfo.builder()
+                .totalSubscribers(totalSubscribers)
+                .build();
     }
 }

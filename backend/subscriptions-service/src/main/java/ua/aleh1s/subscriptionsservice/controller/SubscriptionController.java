@@ -55,4 +55,13 @@ public class SubscriptionController {
                 subscriptionService.getActiveSubscription(subscribedOnId)
         );
     }
+
+    @GetMapping("/subscribers-info")
+    public ResponseEntity<SubscribersInfo> getSubscribersInfo(
+            @RequestParam String userId
+    ) {
+        return ResponseEntity.ok(
+                subscriptionService.getSubscribersInfo(userId)
+        );
+    }
 }
