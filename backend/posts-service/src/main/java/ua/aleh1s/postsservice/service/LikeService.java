@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class LikeService {
+    private static final String COUNT_FIELD = "count";
+
     private final LikeRepository likeRepository;
     private final MongoTemplate mongoTemplate;
     private final CommonGenerator generator;
@@ -81,8 +83,8 @@ public class LikeService {
     public Map<String, Long> getLikesCountByPostId(Set<String> postIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where(Like.Fields.postId).in(postIds)),
-                Aggregation.group(Like.Fields.postId).count().as("count"),
-                Aggregation.project("count").and("_id").as(Like.Fields.postId)
+                Aggregation.group(Like.Fields.postId).count().as(COUNT_FIELD),
+                Aggregation.project(COUNT_FIELD).and("_id").as(Like.Fields.postId)
         );
 
         AggregationResults<Document> results = mongoTemplate.aggregate(
@@ -92,7 +94,7 @@ public class LikeService {
         Map<String, Long> resultMap = new HashMap<>();
         for (Document doc : results.getMappedResults()) {
             String postId = doc.getString(Like.Fields.postId);
-            Number count = doc.get("count", Number.class);
+            Number count = doc.get(COUNT_FIELD, Number.class);
             resultMap.put(postId, count.longValue());
         }
 
@@ -120,8 +122,8 @@ public class LikeService {
         });
 
         return likesCountByDate.entrySet().stream()
-                .map((e) -> new KeyValue<>(e.getKey(), e.getValue()))
+                .map(e -> new KeyValue<>(e.getKey(), e.getValue()))
                 .sorted(Comparator.comparing(KeyValue::key))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

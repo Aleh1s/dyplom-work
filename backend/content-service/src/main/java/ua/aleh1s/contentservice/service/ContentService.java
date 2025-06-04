@@ -1,7 +1,6 @@
 package ua.aleh1s.contentservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +16,6 @@ import ua.aleh1s.contentservice.model.Content;
 import ua.aleh1s.contentservice.repository.ContentRepository;
 import ua.aleh1s.contentservice.utils.CommonGenerator;
 
-import java.util.Collection;
 import java.util.List;
 
 @Service

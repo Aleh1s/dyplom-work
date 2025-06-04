@@ -52,6 +52,15 @@ public class SubscriptionController {
         );
     }
 
+    @PostMapping("/unsubscribe")
+    public ResponseEntity<Subscription> unsubscribe(
+            @RequestBody UnsubscribeRequest unsubscribeRequest
+    ) {
+        return ResponseEntity.ok(
+                subscriptionService.unsubscribe(unsubscribeRequest)
+        );
+    }
+
     @GetMapping("/active")
     public ResponseEntity<Subscription> getActiveSubscription(
             @RequestParam String subscribedOnId

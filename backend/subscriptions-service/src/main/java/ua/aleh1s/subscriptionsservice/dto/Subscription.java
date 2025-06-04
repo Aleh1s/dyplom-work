@@ -11,6 +11,7 @@ public class Subscription {
     private String subscriberId;
     private String subscribedOnId;
     private SubscriptionPlan subscriptionPlan;
+    private boolean cancelled;
     private Instant createdAt;
     private Instant expiredAt;
 }

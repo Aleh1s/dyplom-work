@@ -7,6 +7,9 @@ public class MoneyUtils {
     private static final RoundingMode ROUNDING_MODE = RoundingMode.HALF_UP;
     private static final BigDecimal CENTS_IN_DOLLAR = BigDecimal.valueOf(100);
 
+    private MoneyUtils() {
+    }
+
     public static BigDecimal centsToDollars(int cents) {
         return BigDecimal.valueOf(cents)
                 .divide(CENTS_IN_DOLLAR, 2, ROUNDING_MODE);

@@ -1,7 +1,6 @@
 package ua.aleh1s.statisticsservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ua.aleh1s.statisticsservice.client.PostsApiClient;
 import ua.aleh1s.statisticsservice.client.SubscriptionsApiClient;

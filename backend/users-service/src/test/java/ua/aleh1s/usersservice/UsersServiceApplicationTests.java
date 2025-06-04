@@ -8,6 +8,7 @@ class UsersServiceApplicationTests {
 
     @Test
     void contextLoads() {
+        // check if context loads
     }
 
 }

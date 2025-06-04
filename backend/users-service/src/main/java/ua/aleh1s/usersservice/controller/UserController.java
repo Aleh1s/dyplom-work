@@ -49,13 +49,6 @@ public class UserController {
         );
     }
 
-//    @GetMapping("/{username}")
-//    public ResponseEntity<UserProfile> getUserProfileByUsername(@PathVariable String username) {
-//        return ResponseEntity.ok(
-//                userService.getUserProfileByUsername(username)
-//        );
-//    }
-
     @GetMapping
     public ResponseEntity<List<User>> getUsers(
             @RequestParam(required = false) String usernameLike,

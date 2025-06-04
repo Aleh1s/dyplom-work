@@ -103,25 +103,12 @@ public class UserService {
         Subscription activeSubscription;
         try {
             activeSubscription = subscriptionsClient.getActiveSubscription(userEntity.getId());
-        } catch (FeignException.NotFound e) {
+        } catch (FeignException.NotFound _) {
             activeSubscription = null;
         }
 
         return userMapper.toUserProfile(userEntity, activeSubscription);
     }
-
-//    public UserProfile getUserProfileByUsername(String username) {
-//        UserEntity userEntity = getUserByUsername(username);
-//
-//        Subscription activeSubscription;
-//        try {
-//            activeSubscription = subscriptionsClient.getActiveSubscription(userEntity.getId());
-//        } catch (FeignException.NotFound e) {
-//            activeSubscription = null;
-//        }
-//
-//        return userMapper.toUserProfile(userEntity, activeSubscription);
-//    }
 
     public List<User> getUsersByUsernameLike(String usernameLike) {
         if (Objects.isNull(usernameLike) || usernameLike.isBlank()) {

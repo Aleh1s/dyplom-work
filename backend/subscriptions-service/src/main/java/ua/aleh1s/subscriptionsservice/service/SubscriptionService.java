@@ -1,6 +1,5 @@
 package ua.aleh1s.subscriptionsservice.service;
 
-import com.nimbusds.jose.util.Pair;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -24,9 +23,7 @@ import ua.aleh1s.subscriptionsservice.utils.MoneyUtils;
 
 import java.math.BigDecimal;
 import java.time.*;
-import java.time.temporal.TemporalUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -131,8 +128,6 @@ public class SubscriptionService {
 
         SubscriptionPlanEntity subscriptionPlanEntity = getSubscriptionPlanEntityByUserId(subscribeOnId);
 
-        // todo: payment process
-
         Instant createdAt = Instant.now();
         Instant expiredAt = createdAt.atZone(ZoneId.systemDefault())
                 .plusMonths(1)
@@ -217,7 +212,7 @@ public class SubscriptionService {
     private List<KeyValue<Month, Integer>> getSubscriptionsCountByMonthBySubscribedOnId(String subscribedOnId) {
         int currentYear = LocalDate.now().getYear();
 
-        Map<Month, Integer> subscriptionsByMonth = new HashMap<>();
+        Map<Month, Integer> subscriptionsByMonth = new EnumMap<>(Month.class);
         subscriptionRepository.findSubscriptionEntitiesBySubscribedOnIdAndCreatedAtYear(subscribedOnId, currentYear).forEach(subscription -> {
             Month month = subscription.getCreatedAt()
                     .atZone(ZoneId.systemDefault())
@@ -229,7 +224,7 @@ public class SubscriptionService {
         return subscriptionsByMonth.entrySet().stream()
                 .map(entry -> new KeyValue<>(entry.getKey(), entry.getValue()))
                 .sorted(Comparator.comparingInt(v -> v.key().getValue()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public SubscriptionAnalytics getSubscriptionAnalytics(String userId, Instant from , Instant to) {
@@ -257,6 +252,26 @@ public class SubscriptionService {
         return subscriptionsCountByDate.entrySet().stream()
                 .map(e -> new KeyValue<>(e.getKey(), e.getValue()))
                 .sorted(Comparator.comparing(KeyValue::key))
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    @Transactional
+    public Subscription unsubscribe(UnsubscribeRequest unsubscribeRequest) {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String subscriberId = jwt.getClaimAsString(ClaimsNames.SUBJECT);
+        String subscribedOnId = unsubscribeRequest.getSubscribedOnId();
+
+        Optional<SubscriptionEntity> activeSubscriptionOptional = findActiveSubscription(subscriberId, subscribedOnId);
+        if (activeSubscriptionOptional.isEmpty()) {
+            throw new SubscriptionNotFoundException(unsubscribeRequest.getSubscribedOnId());
+        }
+
+        SubscriptionEntity activeSubscription = activeSubscriptionOptional.get();
+        activeSubscription.setCancelled(true);
+
+        activeSubscription = subscriptionRepository.save(activeSubscription);
+
+        return subscriptionMapper.toSubscription(activeSubscription);
     }
 }

@@ -6,7 +6,6 @@ import ua.aleh1s.postsservice.model.Like;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 public interface LikeRepository extends MongoRepository<Like, String> {

@@ -3,7 +3,7 @@ package ua.aleh1s.usersservice.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 @Entity
@@ -32,5 +32,5 @@ public class UserEntity {
     @MapKeyColumn(name = "social_media_type")
     @MapKeyEnumerated(EnumType.STRING)
     @Column(name = "link")
-    private Map<SocialMediaType, String> socialMediaLinks = new HashMap<>();
+    private Map<SocialMediaType, String> socialMediaLinks = new EnumMap<>(SocialMediaType.class);
 }

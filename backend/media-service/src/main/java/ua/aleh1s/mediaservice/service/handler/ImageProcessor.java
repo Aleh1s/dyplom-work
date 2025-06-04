@@ -25,7 +25,13 @@ public class ImageProcessor implements MediaProcessor {
 
     @Override
     public SaveSafeMediaResponse apply(MultipartFile image) {
-        String fileFormat = image.getContentType().substring(CONTENT_TYPE_PREFIX.length());
+        String contentType = image.getContentType();
+
+        if (Objects.isNull(contentType)) {
+            throw new ImageProcessorException("Content type should not be null");
+        }
+
+        String fileFormat = contentType.substring(CONTENT_TYPE_PREFIX.length());
 
         try {
             Image blurredImage = blurImage.blurImage(image.getInputStream(), fileFormat);

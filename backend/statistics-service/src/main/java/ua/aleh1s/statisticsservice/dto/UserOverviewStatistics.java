@@ -1,6 +1,5 @@
 package ua.aleh1s.statisticsservice.dto;
 
-import com.nimbusds.jose.util.Pair;
 import lombok.Builder;
 import lombok.Data;
 

@@ -23,6 +23,7 @@ public class SubscriptionEntity {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "subscription_plan_id")
     private SubscriptionPlanEntity subscriptionPlan;
+    private boolean isCancelled;
     private Instant createdAt;
     private Instant expiredAt;
 

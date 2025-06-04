@@ -8,6 +8,7 @@ class ContentServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// check for context loads
 	}
 
 }

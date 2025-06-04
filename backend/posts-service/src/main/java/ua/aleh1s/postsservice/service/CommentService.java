@@ -17,11 +17,9 @@ import ua.aleh1s.postsservice.jwt.ClaimsNames;
 import ua.aleh1s.postsservice.mapper.CommentDtoMapper;
 import ua.aleh1s.postsservice.mapper.CommentMapper;
 import ua.aleh1s.postsservice.model.Comment;
-import ua.aleh1s.postsservice.model.Like;
 import ua.aleh1s.postsservice.repository.CommentRepository;
 import ua.aleh1s.postsservice.utils.CommonGenerator;
 
-import java.lang.classfile.CompoundElement;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.*;
@@ -32,6 +30,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CommentService {
+    private static final String COUNT_FIELD = "count";
+
     private final CommentMapper commentMapper;
     private final CommentDtoMapper commentDtoMapper;
     private final CommonGenerator gen;
@@ -88,8 +88,8 @@ public class CommentService {
     public Map<String, Long> getCommentsCountByPostId(Set<String> postsIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where(Comment.Fields.postId).in(postsIds)),
-                Aggregation.group(Comment.Fields.postId).count().as("count"),
-                Aggregation.project("count").and("_id").as(Comment.Fields.postId)
+                Aggregation.group(Comment.Fields.postId).count().as(COUNT_FIELD),
+                Aggregation.project(COUNT_FIELD).and("_id").as(Comment.Fields.postId)
         );
 
         AggregationResults<Document> results = mongoTemplate.aggregate(
@@ -99,7 +99,7 @@ public class CommentService {
         Map<String, Long> resultMap = new HashMap<>();
         for (Document doc : results.getMappedResults()) {
             String postId = doc.getString(Comment.Fields.postId);
-            Number count = doc.get("count", Number.class);
+            Number count = doc.get(COUNT_FIELD, Number.class);
             resultMap.put(postId, count.longValue());
         }
 
@@ -123,8 +123,8 @@ public class CommentService {
         });
 
         return commentsCountByDate.entrySet().stream()
-                .map((e) -> new KeyValue<>(e.getKey(), e.getValue()))
+                .map(e -> new KeyValue<>(e.getKey(), e.getValue()))
                 .sorted(Comparator.comparing(KeyValue::key))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

@@ -4,7 +4,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ua.aleh1s.postsservice.dto.CommentDto;
 import ua.aleh1s.postsservice.dto.UserDto;
-import ua.aleh1s.postsservice.dto.UserProfile;
 import ua.aleh1s.postsservice.model.Comment;
 
 @Mapper(componentModel = "spring")
