@@ -6,4 +6,3 @@ spring:
     active: native
   application:
     name: config
-
