@@ -152,88 +152,102 @@ services:
     networks:
       - sonar-network
 
-  content_service:
-    build: ./content-service
-    depends_on:
-      - keycloak
-      - config_service
-      - discovery_service
-      - content_mongodb
-    networks:
-      - private-network
-
-  media_service:
-    build: ./media-service
-    depends_on:
-      - keycloak
-      - config_service
-      - discovery_service
-      - media_mongodb
-      - minio
-    networks:
-      - private-network
-
-  posts_service:
-    build: ./posts-service
-    depends_on:
-      - keycloak
-      - config_service
-      - discovery_service
-      - posts_mongodb
-    networks:
-      - private-network
-
-  statistics_service:
-    build: ./statistics-service
-    depends_on:
-      - keycloak
-      - config_service
-      - discovery_service
-    networks:
-      - private-network
-
-  bff_service:
-    build: ./bff-service
+  payments_mongodb:
+    image: mongo
+    container_name: payments_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: payments
     ports:
-      - "8081:8080"
-    depends_on:
-      - keycloak
+      - '27020:27017'
+    volumes:
+      - payments_mongo_data:/data/db
     networks:
       - private-network
 
-  config_service:
-    build: ./config-service
-    networks:
-      - private-network
-
-  discovery_service:
-    build: ./discovery-service
-    networks:
-      - private-network
-
-  subscriptions_service:
-    build: ./subscriptions-service
-    environment:
-      CONFIG_SERVICE_URL: http://config_service:8888
-    depends_on:
-      - keycloak
-      - config_service
-      - discovery_service
-      - subscriptions_postgres_db
-    networks:
-      - private-network
-
-  users_service:
-    build: ./users-service
-    environment:
-      CONFIG_SERVICE_URL: http://config_service:8888
-    depends_on:
-      - keycloak
-      - config_service
-      - discovery_service
-      - users_postgres_db
-    networks:
-      - private-network
+#  content_service:
+#    build: ./content-service
+#    depends_on:
+#      - keycloak
+#      - config_service
+#      - discovery_service
+#      - content_mongodb
+#    networks:
+#      - private-network
+#
+#  media_service:
+#    build: ./media-service
+#    depends_on:
+#      - keycloak
+#      - config_service
+#      - discovery_service
+#      - media_mongodb
+#      - minio
+#    networks:
+#      - private-network
+#
+#  posts_service:
+#    build: ./posts-service
+#    depends_on:
+#      - keycloak
+#      - config_service
+#      - discovery_service
+#      - posts_mongodb
+#    networks:
+#      - private-network
+#
+#  statistics_service:
+#    build: ./statistics-service
+#    depends_on:
+#      - keycloak
+#      - config_service
+#      - discovery_service
+#    networks:
+#      - private-network
+#
+#  bff_service:
+#    build: ./bff-service
+#    ports:
+#      - "8081:8080"
+#    depends_on:
+#      - keycloak
+#    networks:
+#      - private-network
+#
+#  config_service:
+#    build: ./config-service
+#    networks:
+#      - private-network
+#
+#  discovery_service:
+#    build: ./discovery-service
+#    networks:
+#      - private-network
+#
+#  subscriptions_service:
+#    build: ./subscriptions-service
+#    environment:
+#      CONFIG_SERVICE_URL: http://config_service:8888
+#    depends_on:
+#      - keycloak
+#      - config_service
+#      - discovery_service
+#      - subscriptions_postgres_db
+#    networks:
+#      - private-network
+#
+#  users_service:
+#    build: ./users-service
+#    environment:
+#      CONFIG_SERVICE_URL: http://config_service:8888
+#    depends_on:
+#      - keycloak
+#      - config_service
+#      - discovery_service
+#      - users_postgres_db
+#    networks:
+#      - private-network
 
 volumes:
   users_postgres_db_data: {}
@@ -246,6 +260,7 @@ volumes:
   sonarqube_data: {}
   sonarqube_extensions: {}
   sonarqube_postgresql: {}
+  payments_mongo_data: {}
 
 networks:
   private-network:

@@ -103,6 +103,10 @@ export interface Post {
   comments: Comment[]
 }
 
+export interface InvoiceUrl {
+  invoiceUrl: string
+}
+
 export const PostType = {
   FREE: 'FREE',
   PREMIUM: 'PREMIUM'
@@ -137,6 +141,10 @@ export interface SubscribersInfo {
 export interface UserOverviewStatistics {
   totalRevenue: number
   totalRevenueGrowPercent: number
+  totalRevenueByMonth: {
+    key: string
+    value: number
+  }[]
   totalActiveSubscriptionsCount: number
   newThisWeekActiveSubscriptionsCount: number
   subscribersCountByMonth: {
@@ -159,6 +167,10 @@ export interface PostWithCounts {
 }
 
 export interface UserAnalytics {
+  revenueGrowth: {
+    key: string
+    value: number
+  }[]
   subscriberGrowth: {
     key: string
     value: number

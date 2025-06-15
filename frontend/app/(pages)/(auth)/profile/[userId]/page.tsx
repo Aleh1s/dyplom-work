@@ -72,7 +72,8 @@ const Profile: FC<Props> = ({ params }) => {
     updateUserProfile,
     subscribe,
     unsubscribe,
-    fetchTotalSubscribers
+    fetchTotalSubscribers,
+    createSubscriptionsInvoice
   } = useProfileStore()
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -165,7 +166,11 @@ const Profile: FC<Props> = ({ params }) => {
   const handleSubscribe = async () => {
     if (!userProfile) return
 
-    await subscribe(userProfile.id)
+    if (subscriptionPlan?.type === SubscriptionType.PREMIUM) {
+      await createSubscriptionsInvoice(userProfile.id)
+    } else if (subscriptionPlan?.type === SubscriptionType.FREE) {
+      await subscribe(userProfile.id)
+    }
   }
 
   if (isUserProfileLoading || isSubscriptionPlanLoading) {
@@ -248,44 +253,44 @@ const Profile: FC<Props> = ({ params }) => {
               {(userProfile.socialMediaLinks?.INSTAGRAM ||
                 userProfile.socialMediaLinks?.TWITTER ||
                 userProfile.socialMediaLinks?.YOUTUBE) && (
-                <div className="mt-4 flex gap-4">
-                  {userProfile.socialMediaLinks?.INSTAGRAM && (
-                    <a
-                      href={`https://instagram.com/${userProfile.socialMediaLinks.INSTAGRAM}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-text-secondary hover:text-primary"
-                      title="Instagram"
-                    >
-                      <Instagram className="h-5 w-5" />
-                    </a>
-                  )}
+                  <div className="mt-4 flex gap-4">
+                    {userProfile.socialMediaLinks?.INSTAGRAM && (
+                      <a
+                        href={`https://instagram.com/${userProfile.socialMediaLinks.INSTAGRAM}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-text-secondary hover:text-primary"
+                        title="Instagram"
+                      >
+                        <Instagram className="h-5 w-5" />
+                      </a>
+                    )}
 
-                  {userProfile.socialMediaLinks?.TWITTER && (
-                    <a
-                      href={`https://twitter.com/${userProfile.socialMediaLinks.TWITTER}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-text-secondary hover:text-primary"
-                      title="Twitter"
-                    >
-                      <Twitter className="h-5 w-5" />
-                    </a>
-                  )}
+                    {userProfile.socialMediaLinks?.TWITTER && (
+                      <a
+                        href={`https://twitter.com/${userProfile.socialMediaLinks.TWITTER}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-text-secondary hover:text-primary"
+                        title="Twitter"
+                      >
+                        <Twitter className="h-5 w-5" />
+                      </a>
+                    )}
 
-                  {userProfile.socialMediaLinks?.YOUTUBE && (
-                    <a
-                      href={`https://youtube.com/@${userProfile.socialMediaLinks.YOUTUBE}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-text-secondary hover:text-primary"
-                      title="YouTube"
-                    >
-                      <Youtube className="h-5 w-5" />
-                    </a>
-                  )}
-                </div>
-              )}
+                    {userProfile.socialMediaLinks?.YOUTUBE && (
+                      <a
+                        href={`https://youtube.com/@${userProfile.socialMediaLinks.YOUTUBE}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-text-secondary hover:text-primary"
+                        title="YouTube"
+                      >
+                        <Youtube className="h-5 w-5" />
+                      </a>
+                    )}
+                  </div>
+                )}
             </div>
 
             <div className="flex gap-3">

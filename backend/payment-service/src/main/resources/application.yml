@@ -1,0 +1,7 @@
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    org.springframework.data.mongodb.core.MongoOperations: DEBUG
+    org.mongodb.driver.protocol.command: DEBUG
+    org.mongodb.driver.protocol.query: DEBUG
+    org.mongodb.driver.connection: DEBUG

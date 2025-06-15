@@ -37,17 +37,6 @@ import useAuthStore from '@/_shared/state/useAuthStore'
 import { Button } from '@/_shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/_shared/ui/card'
 
-// Mock data for charts
-const revenueData = [
-  { name: 'Jan', value: 400 },
-  { name: 'Feb', value: 320 },
-  { name: 'Mar', value: 550 },
-  { name: 'Apr', value: 480 },
-  { name: 'May', value: 590 },
-  { name: 'Jun', value: 700 },
-  { name: 'Jul', value: 750 }
-]
-
 // Mock data for upcoming events
 const upcomingEvents = [
   {
@@ -146,6 +135,11 @@ const Dashboard = () => {
     value: item.value
   }))
 
+  const revenueData = statistics.totalRevenueByMonth.map(item => ({
+    name: item.key.substring(0, 3),
+    value: item.value
+  }))
+
   return (
     <MainLayout>
       <div className="container mx-auto">
@@ -167,11 +161,19 @@ const Dashboard = () => {
               <CardDescription>This month</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$0.00</div>
-              <div className="text-xs text-green-500 flex items-center mt-1">
-                {/* <TrendingUp className="h-3 w-3 mr-1" />
-                <span>+0.00% from last month</span> */}
-              </div>
+              <div className="text-2xl font-bold">${statistics.totalRevenue}</div>
+              {statistics.totalRevenueGrowPercent > 0 && (
+                <div className="text-xs text-green-500 flex items-center mt-1">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  <span>+{statistics.totalRevenueGrowPercent}% from last month</span>
+                </div>
+              )}
+              {statistics.totalRevenueGrowPercent < 0 && (
+                <div className="text-xs text-red-500 flex items-center mt-1">
+                  <TrendingDown className="h-3 w-3 mr-1" />
+                  <span>{statistics.totalRevenueGrowPercent}% from last month</span>
+                </div>
+              )}
             </CardContent>
           </Card>
 

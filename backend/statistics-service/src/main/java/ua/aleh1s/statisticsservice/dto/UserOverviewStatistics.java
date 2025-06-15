@@ -12,6 +12,7 @@ import java.util.List;
 public class UserOverviewStatistics {
     private BigDecimal totalRevenue;
     private BigDecimal totalRevenueGrowPercent;
+    private List<KeyValue<Month, BigDecimal>> totalRevenueByMonth;
 
     private long totalActiveSubscriptionsCount;
     private long newThisWeekActiveSubscriptionsCount;

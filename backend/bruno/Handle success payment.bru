@@ -1,0 +1,11 @@
+meta {
+  name: Handle success payment
+  type: http
+  seq: 30
+}
+
+post {
+  url: http://localhost:8081/payments/subscriptions/success
+  body: none
+  auth: inherit
+}

@@ -1,5 +1,5 @@
 import api from '../config'
-import type { SubscribersInfo, Subscription, SubscriptionPlan } from '../types'
+import type { InvoiceUrl, SubscribersInfo, Subscription, SubscriptionPlan } from '../types'
 
 export type UpdateSubscriptionPlan = Pick<SubscriptionPlan, 'type' | 'price'>
 
@@ -46,5 +46,23 @@ export const subscriptionsApi = {
         }
       })
       .json<SubscribersInfo>()
+  },
+  handleSubscriptionsPayment: (sessionId: string) => {
+    return api
+      .post('payments/subscriptions/success', {
+        json: {
+          sessionId
+        }
+      })
+      .json<Subscription>()
+  },
+  createSubscriptionsInvoice: (subscribeOnId: string) => {
+    return api
+      .post('payments/subscriptions', {
+        json: {
+          subscribeOnId
+        }
+      })
+      .json<InvoiceUrl>()
   }
 }

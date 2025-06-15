@@ -10,17 +10,6 @@
         <module name="discovery-service" />
         <module name="config-service" />
       </profile>
-      <profile name="Annotation profile for statistics-service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
-        </processorPath>
-        <module name="statistics-service" />
-        <module name="bff-service" />
-        <module name="media-service" />
-      </profile>
       <profile name="Annotation profile for users-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -35,6 +24,18 @@
         <module name="users-service" />
         <module name="content-service" />
       </profile>
+      <profile name="Annotation profile for payment-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+        </processorPath>
+        <module name="payment-service" />
+        <module name="statistics-service" />
+        <module name="bff-service" />
+        <module name="media-service" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="auth-service" target="24" />
@@ -48,6 +49,7 @@
       <module name="content-service" options="-parameters" />
       <module name="discovery-service" options="-parameters" />
       <module name="media-service" options="-parameters" />
+      <module name="payment-service" options="-parameters" />
       <module name="posts-service" options="-parameters" />
       <module name="statistics-service" options="-parameters" />
       <module name="subscriptions-service" options="-parameters" />

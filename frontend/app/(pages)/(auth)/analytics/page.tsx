@@ -49,14 +49,10 @@ const Analytics = () => {
     fetchAnalytics()
   }, [date, fetchAnalytics])
 
-  const revenueData = [
-    { date: '2024-01', revenue: 2400 },
-    { date: '2024-02', revenue: 1398 },
-    { date: '2024-03', revenue: 9800 },
-    { date: '2024-04', revenue: 3908 },
-    { date: '2024-05', revenue: 4800 },
-    { date: '2024-06', revenue: 3800 }
-  ]
+  const revenueData = analytics?.revenueGrowth.map(item => ({
+    date: item.key,
+    revenue: item.value
+  })) ?? []
 
   const subscriberData =
     analytics?.subscriberGrowth.map(item => ({

@@ -23,6 +23,7 @@ interface ProfileStoreType {
   subscribe: (userId: string) => Promise<void>
   unsubscribe: (userId: string) => Promise<void>
   fetchTotalSubscribers: (userId: string) => Promise<void>
+  createSubscriptionsInvoice: (subscribeOnId: string) => Promise<void>
 }
 
 const useProfileStore = create<ProfileStoreType>((set, get) => ({
@@ -194,6 +195,15 @@ const useProfileStore = create<ProfileStoreType>((set, get) => ({
       set({ totalSubscribers: response.totalSubscribers })
     } catch {
       toast.error('Failed to fetch total subscribers')
+    }
+  },
+  createSubscriptionsInvoice: async (subscribeOnId: string) => {
+    try {
+      const response = await subscriptionsApi.createSubscriptionsInvoice(subscribeOnId)
+
+      window.open(response.invoiceUrl, '_blank')
+    } catch {
+      toast.error('Failed to create subscriptions invoice')
     }
   }
 }))
